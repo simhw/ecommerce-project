@@ -3,42 +3,27 @@ package com.ecommerce.common.model
 import java.math.BigDecimal
 
 data class Money(
-    private val value: BigDecimal
+    val amount: BigDecimal
 ) {
-    fun plus(other: Money): Money {
-        if (other.value <= BigDecimal.ZERO) {
+    companion object {
+        fun of(amount: BigDecimal) = Money(amount)
+    }
+
+    fun plus(money: Money): Money {
+        if (money.amount <= BigDecimal.ZERO) {
             throw ArithmeticException()
         }
-        return Money(value + other.value)
+        return Money(this.amount.add(money.amount))
     }
 
-    fun plus(other: BigDecimal): Money {
-        if (other <= BigDecimal.ZERO) {
+    fun minus(money: Money): Money {
+        if (this.amount < money.amount) {
             throw ArithmeticException()
         }
-        return Money(value + other)
+        return Money(amount - money.amount)
     }
 
-    fun plus(other: Long): Money {
-        if (BigDecimal.valueOf(other) <= BigDecimal.ZERO) {
-            throw ArithmeticException()
-        }
-        return Money(value + BigDecimal.valueOf(other))
+    fun times(money: Long): Money {
+        return Money(amount * BigDecimal.valueOf(money.toDouble()))
     }
-
-    fun minus(other: Money): Money {
-        if (other.value < other.value) {
-            throw ArithmeticException()
-        }
-        return Money(value - other.value)
-    }
-
-    fun minus(other: Long): Money {
-        return Money(value - BigDecimal.valueOf(other.toDouble()))
-    }
-
-    fun times(other: Long): Money {
-        return Money(value * BigDecimal.valueOf(other.toDouble()))
-    }
-
 }

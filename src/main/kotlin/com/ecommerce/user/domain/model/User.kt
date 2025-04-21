@@ -1,11 +1,17 @@
 package com.ecommerce.user.domain.model
 
-import com.ecommerce.account.domain.model.Account
+import java.time.LocalDateTime
 
 class User(
-    id: Long,
-    email: String,
-    name: String,
-    account: Account
+    val id: Long,
+    val email: String,
+    val name: String,
+    val createdAt: LocalDateTime?,
+    private val deletedAt: LocalDateTime?
 ) {
+    fun verifyActiveUser() {
+        if (deletedAt != null) {
+            throw IllegalArgumentException("invalid user")
+        }
+    }
 }
