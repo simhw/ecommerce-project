@@ -5,12 +5,19 @@ import com.ecommerce.user.domain.model.User
 import org.springframework.stereotype.Repository
 
 @Repository
-class UserPersistenceAdapter : LoadUserPort {
+class UserPersistenceAdapter(
+    private val userJpaRepository: UserJpaRepository,
+    private val userEntityMapper: UserEntityMapper
+) : LoadUserPort {
     override fun loadUserBy(id: Long): User {
-        TODO("Not yet implemented")
+        val userEntity = userJpaRepository.findById(id)
+            .orElseThrow { IllegalArgumentException("not found user") }
+        return userEntityMapper.toUser(userEntity)
     }
 
     override fun loadUserBy(email: String): User {
-        TODO("Not yet implemented")
+        val userEntity = userJpaRepository.findByEmail(email)
+            .orElseThrow { IllegalArgumentException("not found user") }
+        return userEntityMapper.toUser(userEntity)
     }
 }
