@@ -1,1 +1,1 @@
-rootProject.name = "ecommerce-proejct"
+rootProject.name = "ecommerce-project"
