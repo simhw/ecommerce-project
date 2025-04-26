@@ -1,6 +1,6 @@
 package com.ecommerce.usercoupon.command.adapter.out.persistence
 
-import com.ecommerce.coupon.adapter.out.persistence.CouponEntityMapper
+import com.ecommerce.coupon.command.adapter.out.persistence.CouponEntityMapper
 import com.ecommerce.usercoupon.command.domain.model.UserCoupon
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping

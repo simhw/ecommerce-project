@@ -1,4 +1,4 @@
-package com.ecommerce.coupon.adapter.out.persistence.entity;
+package com.ecommerce.coupon.command.adapter.out.persistence.entity;
 
 import com.ecommerce.common.BaseEntity;
 import com.ecommerce.common.model.DateTimePeriod;

@@ -1,4 +1,4 @@
-package com.ecommerce.coupon.application
+package com.ecommerce.coupon.command.application.port.out
 
 import com.ecommerce.coupon.domain.model.Coupon
 

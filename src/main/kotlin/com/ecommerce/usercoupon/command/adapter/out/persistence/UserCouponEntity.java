@@ -1,7 +1,7 @@
 package com.ecommerce.usercoupon.command.adapter.out.persistence;
 
 import com.ecommerce.common.BaseEntity;
-import com.ecommerce.coupon.adapter.out.persistence.entity.CouponEntity;
+import com.ecommerce.coupon.command.adapter.out.persistence.entity.CouponEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,6 +1,6 @@
 package com.ecommerce.usercoupon.command.domain.service
 
-import com.ecommerce.coupon.application.LoadCouponPort
+import com.ecommerce.coupon.command.application.port.out.LoadCouponPort
 import com.ecommerce.user.application.out.LoadUserPort
 import com.ecommerce.usercoupon.command.application.`in`.IssueCouponCommand
 import com.ecommerce.usercoupon.command.application.`in`.IssueCouponUseCase

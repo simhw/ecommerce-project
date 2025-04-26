@@ -1,4 +1,4 @@
-package com.ecommerce.coupon.adapter.`in`.web
+package com.ecommerce.coupon.command.adapter.`in`.web
 
 
 data class CouponDto(

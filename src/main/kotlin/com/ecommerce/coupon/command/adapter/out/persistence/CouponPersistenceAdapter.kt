@@ -1,6 +1,6 @@
-package com.ecommerce.coupon.adapter.out.persistence
+package com.ecommerce.coupon.command.adapter.out.persistence
 
-import com.ecommerce.coupon.application.LoadCouponPort
+import com.ecommerce.coupon.command.application.port.out.LoadCouponPort
 import com.ecommerce.coupon.domain.model.Coupon
 import org.springframework.stereotype.Repository
 

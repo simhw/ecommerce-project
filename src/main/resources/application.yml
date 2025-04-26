@@ -9,11 +9,11 @@ spring:
     console:
       enabled: true
       path: /h2-console
-#  sql:
-#    init:
-#      mode: always
+  sql:
+    init:
+      mode: always
   jpa:
-    generate-ddl: true
+    generate-ddl: false
     hibernate:
       ddl-auto: none
     properties:

@@ -1,4 +1,4 @@
-package com.ecommerce.coupon.adapter.out.persistence.entity;
+package com.ecommerce.coupon.command.adapter.out.persistence.entity;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
