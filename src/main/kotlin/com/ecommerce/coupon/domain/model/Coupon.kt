@@ -1,21 +1,79 @@
 package com.ecommerce.coupon.domain.model
 
 import com.ecommerce.common.model.Money
+import com.ecommerce.common.model.DateTimePeriod
+import java.math.BigDecimal
 
-sealed class Coupon {
-    abstract fun calculateDiscount(quantity: Long, amount: Money): Money
+import java.time.LocalDateTime
 
-    class PercentDiscount(
-        val discountPercent: Double
-    ) : Coupon() {
-        override fun calculateDiscount(quantity: Long, amount: Money): Money =
-            amount.times(quantity).times(100)
+abstract class Coupon(
+    val id: Long? = null,
+    var name: String,
+    var description: String,
+    var minOrderAmount: Money,
+    var maxDiscountAmount: Money,
+    private var useOfPeriod: DateTimePeriod,
+    private var issueOfPeriod: DateTimePeriod,
+) {
+    abstract fun calculateDiscountAmount(price: Money): Money
+
+    fun verifyPeriodOfUse() {
+        if (!useOfPeriod.isWithin(LocalDateTime.now())) {
+            throw IllegalArgumentException("not valid period of use")
+        }
     }
 
-    class AmountDiscount(
-        val discountAmount: Money
-    ) : Coupon() {
-        override fun calculateDiscount(quantity: Long, amount: Money) =
-            amount.times(quantity).minus(discountAmount)
+    fun verifyPeriodOfIssue() {
+        if (!issueOfPeriod.isWithin(LocalDateTime.now())) {
+            throw IllegalArgumentException("not valid period of issue")
+        }
+    }
+}
+
+class PercentDiscountCoupon(
+    id: Long? = null,
+    name: String,
+    description: String,
+    minOrderAmount: Money,
+    maxDiscountAmount: Money,
+    useOfPeriod: DateTimePeriod,
+    issueOfPeriod: DateTimePeriod,
+    private val percent: BigDecimal
+) : Coupon(id, name, description, minOrderAmount, maxDiscountAmount, useOfPeriod, issueOfPeriod) {
+    override fun calculateDiscountAmount(price: Money): Money {
+        verifyPeriodOfUse()
+
+        if (minOrderAmount.amount > price.amount) {
+            throw IllegalArgumentException("invalid amount")
+        }
+        val discounted = price.multiply(this.percent)
+        return if (discounted.amount < maxDiscountAmount.amount)
+            maxDiscountAmount
+        else
+            discounted
+    }
+}
+
+class AmountDiscountCoupon(
+    id: Long? = null,
+    name: String,
+    description: String,
+    minOrderAmount: Money,
+    maxDiscountAmount: Money,
+    useOfPeriod: DateTimePeriod,
+    issueOfPeriod: DateTimePeriod,
+    private val amount: Money
+) : Coupon(id, name, description, minOrderAmount, maxDiscountAmount, useOfPeriod, issueOfPeriod) {
+    override fun calculateDiscountAmount(price: Money): Money {
+        verifyPeriodOfUse()
+
+        if (minOrderAmount.amount > price.amount) {
+            throw IllegalArgumentException("invalid amount")
+        }
+        val discounted = this.amount
+        return if (discounted.amount < maxDiscountAmount.amount)
+            maxDiscountAmount
+        else
+            discounted
     }
 }

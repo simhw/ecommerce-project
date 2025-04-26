@@ -38,4 +38,11 @@ public class Money {
         }
         return new Money(this.amount.subtract(money.amount));
     }
+
+    public Money multiply(BigDecimal number) {
+        if (number.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ArithmeticException("can't add zero or negative money");
+        }
+        return new Money(this.amount.multiply(number));
+    }
 }
