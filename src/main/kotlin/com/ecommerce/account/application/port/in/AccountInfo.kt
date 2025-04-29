@@ -12,7 +12,7 @@ data class AccountInfo(
     companion object {
         fun from(account: Account) = AccountInfo(
             account.id,
-            account.balance.amount,
+            account.balance.getAmount(),
             account.updatedAt
         )
     }

@@ -3,6 +3,8 @@ package com.ecommerce.common.model;
 import jakarta.persistence.Embeddable;
 
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.function.Function;
 
 @Embeddable
 public class Money {
@@ -12,6 +14,12 @@ public class Money {
 
     public static Money of(BigDecimal amount) {
         return new Money(amount);
+    }
+
+    public static <T> Money sum(Collection<T> bags, Function<T, Money> monetary) {
+        return bags.stream()
+                .map(monetary)
+                .reduce(Money.ZERO, Money::plus);
     }
 
     protected Money() {
@@ -44,5 +52,13 @@ public class Money {
             throw new ArithmeticException("can't add zero or negative money");
         }
         return new Money(this.amount.multiply(number));
+    }
+
+    public boolean isLessThan(Money money) {
+        return this.amount.compareTo(money.amount) < 0;
+    }
+
+    public boolean isGreaterThanOrEqual(Money money) {
+        return this.amount.compareTo(money.amount) >= 0;
     }
 }

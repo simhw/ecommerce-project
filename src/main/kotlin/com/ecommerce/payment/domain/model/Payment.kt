@@ -1,6 +1,6 @@
 package com.ecommerce.payment.domain.model
 
-import com.ecommerce.order.domain.Order
+import com.ecommerce.order.command.domain.model.Order
 import java.time.LocalDateTime
 
 class Payment(

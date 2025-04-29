@@ -18,8 +18,12 @@ class IssueCouponService(
     @Transactional
     override fun issueCoupon(command: IssueCouponCommand) {
         val user = loadUserPort.loadUserBy(command.userId)
+        user.verifyActiveUser()
+
         val coupon = loadCouponPort.loadCouponBy(command.couponId)
-        val userCoupon = UserCoupon.issue(user, coupon)
-        saveUserCouponPort.saveUserCoupon(userCoupon)
+        user.id?.let {
+            val userCoupon = UserCoupon.issue(user.id, coupon)
+            saveUserCouponPort.saveUserCoupon(userCoupon)
+        }
     }
 }

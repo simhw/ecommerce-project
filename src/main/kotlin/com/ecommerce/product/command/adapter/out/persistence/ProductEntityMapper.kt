@@ -5,8 +5,10 @@ import com.ecommerce.product.command.domain.model.ProductStock
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 
-@Mapper(componentModel = "spring",
-    uses = [ProductStockEntityMapper::class, ])
+@Mapper(
+    componentModel = "spring",
+    uses = [ProductStockEntityMapper::class]
+)
 interface ProductEntityMapper {
     fun toProduct(entity: ProductEntity): Product
 
@@ -21,12 +23,3 @@ interface ProductStockEntityMapper {
 
     fun toProductStock(entity: ProductStockEntity): ProductStock
 }
-
-//@Mapper(componentModel = "spring")
-//interface MoneyMapper {
-//    @Named("toMoney")
-//    fun toMoney(amount: BigDecimal): Money = Money(amount)
-//
-//    @Named("toBigDecimal")
-//    fun toBigDecimal(money: Money): BigDecimal = money.amount
-//}

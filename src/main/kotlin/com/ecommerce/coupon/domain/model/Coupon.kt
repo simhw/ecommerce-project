@@ -41,16 +41,13 @@ class PercentDiscountCoupon(
     private val percent: BigDecimal
 ) : Coupon(id, name, description, minOrderAmount, maxDiscountAmount, useOfPeriod, issueOfPeriod) {
     override fun calculateDiscountAmount(price: Money): Money {
-        verifyPeriodOfUse()
-
         if (minOrderAmount.amount > price.amount) {
             throw IllegalArgumentException("invalid amount")
         }
         val discounted = price.multiply(this.percent)
-        return if (discounted.amount < maxDiscountAmount.amount)
-            maxDiscountAmount
-        else
+        return if (discounted.isLessThan(maxDiscountAmount))
             discounted
+        else maxDiscountAmount
     }
 }
 
@@ -65,15 +62,12 @@ class AmountDiscountCoupon(
     private val amount: Money
 ) : Coupon(id, name, description, minOrderAmount, maxDiscountAmount, useOfPeriod, issueOfPeriod) {
     override fun calculateDiscountAmount(price: Money): Money {
-        verifyPeriodOfUse()
-
         if (minOrderAmount.amount > price.amount) {
             throw IllegalArgumentException("invalid amount")
         }
         val discounted = this.amount
-        return if (discounted.amount < maxDiscountAmount.amount)
-            maxDiscountAmount
-        else
+        return if (discounted.isLessThan(maxDiscountAmount))
             discounted
+        else maxDiscountAmount
     }
 }
