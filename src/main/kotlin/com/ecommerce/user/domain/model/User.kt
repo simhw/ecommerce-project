@@ -21,8 +21,10 @@ class User(
         }
     }
 
+    fun getIdOrThrow() = id ?: throw IllegalStateException("id is null.")
+
     fun verifyActiveUser() {
-        deletedAt?.let { throw IllegalArgumentException("invalid user") }
+        deletedAt ?: throw IllegalStateException("invalid active user.")
     }
 
     fun withdraw() {

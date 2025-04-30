@@ -13,11 +13,7 @@ class UserCoupon(
     companion object {
         fun issue(userId: Long, coupon: Coupon): UserCoupon {
             coupon.verifyPeriodOfIssue()
-            return UserCoupon(
-                userId = userId,
-                coupon = coupon,
-                status = UserCouponStatus.UNUSED
-            )
+            return UserCoupon(userId = userId, coupon = coupon, status = UserCouponStatus.UNUSED)
         }
     }
 
