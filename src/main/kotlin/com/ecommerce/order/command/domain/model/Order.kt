@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter
 class Order(
     val id: Long?,
     var number: String?,
-    val orderer: User,
+    val user: User,
     var address: Address,
     val items: List<OrderLineItem>,
     var totalAmounts: Money = Money.ZERO,
@@ -19,11 +19,11 @@ class Order(
     val createdAt: LocalDateTime
 ) {
     companion object {
-        fun of(orderer: User, address: Address, items: List<OrderLineItem>): Order {
+        fun of(user: User, address: Address, items: List<OrderLineItem>): Order {
             return Order(
                 id = null,
                 number = null,
-                orderer = orderer,
+                user = user,
                 address = address,
                 items = items,
                 createdAt = LocalDateTime.now()
@@ -31,6 +31,9 @@ class Order(
         }
     }
 
+    /**
+     * 주문하기
+     */
     fun place(userCoupon: UserCoupon?) {
         generateOrderNumber()
         calculateTotalAmount()
@@ -49,10 +52,9 @@ class Order(
 
     /**
      * 총 주문 금액 계산
-     *
      */
     private fun calculateTotalAmount() {
-        this.totalAmounts = Money.sum(items) { it.calculateAmount() }
+        this.totalAmounts = Money.sum(items) { it.amount }
     }
 
     /**
@@ -74,8 +76,10 @@ class Order(
      * 1-3. 할인 쿠폰을 사용 처리한다.(event) - after commit
      */
     private fun applyCoupon(userCoupon: UserCoupon) {
-        userCoupon.coupon.verifyPeriodOfUse()
-        this.totalDiscountAmounts = userCoupon.coupon.calculateDiscountAmount(totalAmounts)
+        val coupon = userCoupon.coupon
+        coupon.verifyPeriodOfUse()
+        coupon.isSatisfyCondition(this.totalAmounts)
+        this.totalDiscountAmounts = coupon.calculateDiscountAmount(totalAmounts)
         userCoupon.used()
     }
 
@@ -100,6 +104,5 @@ class Order(
     fun canceled() {
         this.status = OrderStatus.CANCELED
     }
-
 }
 

@@ -1,4 +1,4 @@
-package com.ecommerce.order.command.adapter.out.persistence;
+package com.ecommerce.order.command.adapter.out.persistence.entity;
 
 import com.ecommerce.common.model.Money;
 import jakarta.persistence.*;
@@ -18,11 +18,16 @@ public class OrderLineItemEntity {
     @Column(name = "order_line_item_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "product_id")
     private Long productId;
+
     @Embedded
     @AttributeOverride(name = "amount", column = @Column(name = "item_price"))
     private Money price;
+
     private BigDecimal quantity;
+
     @Embedded
     @AttributeOverride(name = "amount", column = @Column(name = "item_amount"))
     private Money amount;
