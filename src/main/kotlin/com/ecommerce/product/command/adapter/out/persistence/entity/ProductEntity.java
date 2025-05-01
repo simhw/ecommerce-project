@@ -1,4 +1,4 @@
-package com.ecommerce.product.command.adapter.out.persistence;
+package com.ecommerce.product.command.adapter.out.persistence.entity;
 
 import com.ecommerce.common.BaseEntity;
 import com.ecommerce.common.model.Money;

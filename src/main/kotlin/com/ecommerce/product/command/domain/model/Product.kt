@@ -18,6 +18,6 @@ class Product(
     }
 
     fun adjustStock(delta: BigDecimal) {
-        this.stock.value.plus(delta)
+        this.stock.value = this.stock.value.add(delta)
     }
 }

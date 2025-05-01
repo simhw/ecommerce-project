@@ -1,5 +1,7 @@
 package com.ecommerce.product.command.adapter.out.persistence
 
+import com.ecommerce.product.command.adapter.out.persistence.entity.ProductEntity
+import com.ecommerce.product.command.adapter.out.persistence.entity.ProductStockEntity
 import com.ecommerce.product.command.domain.model.Product
 import com.ecommerce.product.command.domain.model.ProductStock
 import org.mapstruct.Mapper
@@ -10,16 +12,15 @@ import org.mapstruct.Mapping
     uses = [ProductStockEntityMapper::class]
 )
 interface ProductEntityMapper {
-    fun toProduct(entity: ProductEntity): Product
-
     fun toProductEntity(domain: Product): ProductEntity
+
+    fun toProduct(entity: ProductEntity): Product
 }
 
 @Mapper(componentModel = "spring")
 interface ProductStockEntityMapper {
-    // circular reference
     @Mapping(target = "product", ignore = true)
-    fun toProductStockEntity(domain: ProductStock): ProductStockEntity
+    fun toProductStockEntity(productStock: ProductStock): ProductStockEntity
 
-    fun toProductStock(entity: ProductStockEntity): ProductStock
+    fun toProductStock(productStockEntity: ProductStockEntity): ProductStock
 }

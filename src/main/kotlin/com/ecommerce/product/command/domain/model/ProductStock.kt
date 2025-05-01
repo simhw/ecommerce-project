@@ -5,8 +5,6 @@ import java.time.LocalDateTime
 
 class ProductStock(
     val id: Long? = null,
-    val value: BigDecimal,
-    val product: Product,
+    var value: BigDecimal,
     val updatedAt: LocalDateTime,
-) {
-}
+)

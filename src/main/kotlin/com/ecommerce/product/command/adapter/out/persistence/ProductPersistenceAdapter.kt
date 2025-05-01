@@ -17,10 +17,7 @@ class ProductPersistenceAdapter(
     }
 
     override fun saveProduct(product: Product) {
-        TODO("Not yet implemented")
-    }
-
-    override fun saveAllProducts(products: List<Product>) {
-        TODO("Not yet implemented")
+        val productEntity = productEntityMapper.toProductEntity(product)
+        productJpaRepository.save(productEntity)
     }
 }

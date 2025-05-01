@@ -1,4 +1,4 @@
-package com.ecommerce.product.command.adapter.out.persistence;
+package com.ecommerce.product.command.adapter.out.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,8 +19,10 @@ public class ProductStockEntity {
     @Column(name = "product_stock_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "stock_value")
     private BigDecimal value;
+
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private ProductEntity product;
