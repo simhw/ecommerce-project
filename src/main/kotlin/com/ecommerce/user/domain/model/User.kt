@@ -3,11 +3,11 @@ package com.ecommerce.user.domain.model
 import java.time.LocalDateTime
 
 class User(
-    val id: Long?,
+    val id: Long? = null,
     var email: String,
     var name: String?,
     val createdAt: LocalDateTime,
-    var deletedAt: LocalDateTime?
+    var deletedAt: LocalDateTime? = null
 ) {
     companion object {
         fun register(email: String, name: String?): User {
