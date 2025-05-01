@@ -1,12 +1,12 @@
-package com.ecommerce.order.adapter.`in`.web
+package com.ecommerce.order.command.adapter.`in`.web
 
+import java.math.BigDecimal
 import java.time.LocalDateTime
 
 data class OrderDto(
-    val id: Long,
     val number: String,
-    val totalAmount: Long,
-    val totalDiscountAmount: Long,
+    val totalAmount: BigDecimal,
+    val totalDiscountAmount: BigDecimal,
     val createdAt: LocalDateTime
 )
 

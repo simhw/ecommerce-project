@@ -2,6 +2,7 @@ package com.ecommerce.usercoupon.command.adapter.out.persistence;
 
 import com.ecommerce.common.BaseEntity;
 import com.ecommerce.coupon.command.adapter.out.persistence.entity.CouponEntity;
+import com.ecommerce.usercoupon.command.domain.model.UserCouponStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,9 @@ public class UserCouponEntity extends BaseEntity {
     private Long id;
 
     private Long userId;
+
+    @Enumerated(EnumType.STRING)
+    private UserCouponStatus status;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id")
