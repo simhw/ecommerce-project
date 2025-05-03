@@ -12,8 +12,10 @@ import org.mapstruct.Mapping
     uses = [OrderLineItemEntityMapper::class]
 )
 interface OrderEntityMapper {
-    @Mapping(source = "user.id", target = "userId")
     fun toOrderEntity(order: Order): OrderEntity
+
+    @Mapping(target = "items", ignore = true)
+    fun toOrder(orderEntity: OrderEntity): Order
 }
 
 @Mapper(componentModel = "spring")

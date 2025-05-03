@@ -6,18 +6,17 @@ import java.math.BigDecimal
 
 class OrderLineItem(
     val id: Long? = null,
+    val product: Product,
     val price: Money,
     val quantity: BigDecimal,
     var amount: Money? = Money.ZERO,
-    val product: Product
 ) {
     companion object {
-        fun of(quantity: BigDecimal, product: Product): OrderLineItem {
+        fun of(product: Product, quantity: BigDecimal): OrderLineItem {
             val item = OrderLineItem(
-                null,
+                product = product,
                 price = product.price,
                 quantity = quantity,
-                product = product
             )
             item.amount = item.calculateAmount()
             return item

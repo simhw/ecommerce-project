@@ -10,9 +10,9 @@ import java.time.format.DateTimeFormatter
 class Order(
     val id: Long?,
     var number: String?,
-    val user: User,
+    val userId: Long,
     var address: Address,
-    val items: List<OrderLineItem>,
+    val items: List<OrderLineItem>?,
     var totalAmounts: Money = Money.ZERO,
     var totalDiscountAmounts: Money = Money.ZERO,
     var status: OrderStatus = OrderStatus.PENDING,
@@ -23,7 +23,7 @@ class Order(
             return Order(
                 id = null,
                 number = null,
-                user = user,
+                userId = user.getIdOrThrow(),
                 address = address,
                 items = items,
                 createdAt = LocalDateTime.now()
@@ -63,7 +63,7 @@ class Order(
      * 1-2. 재고가 있는 경우 재고를 차감한다.(event) - before commit
      */
     private fun adjustProductStock() {
-        items.forEach {
+        items?.forEach {
             it.product.verifyEnoughStock(it.quantity)
             it.product.adjustStock(-it.quantity)
         }
@@ -88,7 +88,7 @@ class Order(
      * 상품 재고 원복
      */
     private fun restoreProductStock() {
-        items.forEach {
+        items?.forEach {
             it.product.adjustStock(it.quantity)
         }
     }
@@ -98,10 +98,16 @@ class Order(
     }
 
     fun paid() {
+        if (this.status != OrderStatus.ORDERED) {
+            throw IllegalArgumentException("is not valid order")
+        }
         this.status = OrderStatus.PAID
     }
 
     fun canceled() {
+        if (this.status == OrderStatus.PAID) {
+            throw IllegalArgumentException("already paid order")
+        }
         this.status = OrderStatus.CANCELED
     }
 }

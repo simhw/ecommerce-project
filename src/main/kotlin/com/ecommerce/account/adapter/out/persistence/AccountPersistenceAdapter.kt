@@ -1,18 +1,24 @@
 package com.ecommerce.account.adapter.out.persistence
 
 import com.ecommerce.account.application.port.out.LoadAccountPort
-import com.ecommerce.account.application.port.out.UpdateAccountPort
+import com.ecommerce.account.application.port.out.SaveAccountPort
 import com.ecommerce.account.domain.model.Account
 import com.ecommerce.user.domain.model.User
 import org.springframework.stereotype.Repository
 
 @Repository
-class AccountPersistenceAdapter: LoadAccountPort, UpdateAccountPort {
+class AccountPersistenceAdapter(
+    private val accountJpaRepository: AccountJpaRepository,
+    private val accountEntityMapper: AccountEntityMapper
+) : LoadAccountPort, SaveAccountPort {
     override fun loadAccountBy(user: User): Account {
-        TODO("Not yet implemented")
+        val accountEntity = accountJpaRepository.findByUserId(user.getIdOrThrow())
+            .orElseThrow { IllegalArgumentException("not found account") }
+        return accountEntityMapper.toAccount(accountEntity)
     }
 
-    override fun updateAccount(account: Account) {
-        TODO("Not yet implemented")
+    override fun saveAccount(account: Account) {
+        val accountEntity = accountEntityMapper.toAccountEntity(account)
+        accountJpaRepository.save(accountEntity)
     }
 }

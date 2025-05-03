@@ -27,7 +27,7 @@ class PlaceOrderService(
     override fun placeOrder(command: PlaceOrderCommand): OrderInfo {
         val user = loadUserPort.loadUserBy(command.userId)
         val products = command.items.map { loadProductPort.loadProductBy(it.productId) }
-        val items = command.items.mapIndexed { idx, it -> OrderLineItem.of(it.quantity, products[idx]) }
+        val items = command.items.mapIndexed { index, it -> OrderLineItem.of(products[index], it.quantity) }
         val userCoupon = command.userCouponId?.let { loadUserCouponPort.loadUserCouponBy(it) }
         val order = Order.of(user, command.address, items)
         order.place(userCoupon)

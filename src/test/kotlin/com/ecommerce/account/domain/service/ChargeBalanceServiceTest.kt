@@ -2,7 +2,7 @@ package com.ecommerce.account.domain.service
 
 import com.ecommerce.account.application.port.`in`.ChargeBalanceCommand
 import com.ecommerce.account.application.port.out.LoadAccountPort
-import com.ecommerce.account.application.port.out.UpdateAccountPort
+import com.ecommerce.account.application.port.out.SaveAccountPort
 import com.ecommerce.account.domain.model.Account
 import com.ecommerce.common.model.Money
 import com.ecommerce.user.application.out.LoadUserPort
@@ -16,10 +16,10 @@ import java.time.LocalDateTime
 
 class ChargeBalanceServiceTest {
     private val loadAccountPort = mockk<LoadAccountPort>()
-    private val updateAccountPort = mockk<UpdateAccountPort>(relaxed = true)
+    private val saveAccountPort = mockk<SaveAccountPort>(relaxed = true)
     private val loadUserPort = mockk<LoadUserPort>()
 
-    private val chargeBalanceService = ChargeBalanceService(loadUserPort, loadAccountPort, updateAccountPort)
+    private val chargeBalanceService = ChargeBalanceService(loadUserPort, loadAccountPort, saveAccountPort)
 
     @Test
     fun `잔액이 충전 금액만큼 증가한다`() {
@@ -39,7 +39,7 @@ class ChargeBalanceServiceTest {
         // then
         verify { loadUserPort.loadUserBy(1L) }
         verify { loadAccountPort.loadAccountBy(user) }
-        verify { updateAccountPort.updateAccount(account) }
+        verify { saveAccountPort.saveAccount(account) }
 
         println(info)
         assert(info.balance == BigDecimal.valueOf(11000))

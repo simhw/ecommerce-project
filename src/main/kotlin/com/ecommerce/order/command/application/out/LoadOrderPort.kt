@@ -1,5 +1,9 @@
 package com.ecommerce.order.command.application.out
 
-interface LoadOrderPort {
+import com.ecommerce.order.command.domain.model.Order
 
+interface LoadOrderPort {
+    fun loadOrderBy(id: Long): Order
+
+    fun loadOrderBy(number: String): Order
 }
