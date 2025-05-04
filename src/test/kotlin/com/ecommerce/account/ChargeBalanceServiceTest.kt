@@ -1,9 +1,10 @@
-package com.ecommerce.account.domain.service
+package com.ecommerce.account
 
 import com.ecommerce.account.application.port.`in`.ChargeBalanceCommand
 import com.ecommerce.account.application.port.out.LoadAccountPort
 import com.ecommerce.account.application.port.out.SaveAccountPort
 import com.ecommerce.account.domain.model.Account
+import com.ecommerce.account.domain.service.ChargeBalanceService
 import com.ecommerce.common.model.Money
 import com.ecommerce.user.application.out.LoadUserPort
 import com.ecommerce.user.domain.model.User

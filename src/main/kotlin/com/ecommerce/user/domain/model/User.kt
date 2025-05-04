@@ -23,9 +23,7 @@ class User(
 
     fun getIdOrThrow() = id ?: throw IllegalStateException("id is null.")
 
-    fun verifyActiveUser() {
-        deletedAt ?: throw IllegalStateException("invalid active user.")
-    }
+    fun verifyActiveUser() = deletedAt?.let { throw IllegalStateException("invalid active user.") }
 
     fun withdraw() {
         this.deletedAt = LocalDateTime.now()
