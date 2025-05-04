@@ -1,4 +1,4 @@
-package com.ecommerce.usercoupon.command.domain.service
+package com.ecommerce.usercoupon
 
 import com.ecommerce.common.model.DateTimePeriod
 import com.ecommerce.common.model.Money
@@ -8,6 +8,7 @@ import com.ecommerce.user.application.out.LoadUserPort
 import com.ecommerce.user.domain.model.User
 import com.ecommerce.usercoupon.command.application.`in`.IssueCouponCommand
 import com.ecommerce.usercoupon.command.application.out.SaveUserCouponPort
+import com.ecommerce.usercoupon.command.domain.service.IssueCouponService
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThatThrownBy
