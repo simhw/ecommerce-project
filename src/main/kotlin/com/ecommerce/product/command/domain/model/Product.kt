@@ -11,13 +11,31 @@ class Product(
     var stock: ProductStock,
     var status: ProductStatus,
 ) {
-    fun verifyEnoughStock(count: BigDecimal) {
+    private fun verifyAvailableForSale() {
+        if (status != ProductStatus.SELL) {
+            throw IllegalArgumentException("is not available for sale")
+        }
+    }
+
+    private fun verifyEnoughStock(count: BigDecimal) {
         if (this.stock.value < count) {
             throw IllegalArgumentException("not enough stock")
         }
     }
 
-    fun adjustStock(delta: BigDecimal) {
-        this.stock.value = this.stock.value.add(delta)
+    /**
+     * 상품 재고 감소
+     * 1-1. ✅상품의 재고가 주문 수량보다 많은지 확인한다.
+     * 1-2. TODO: 재고가 있는 경우 재고를 차감한다.(event) - before commit
+     */
+    fun adjustStockForSale(count: BigDecimal) {
+        verifyAvailableForSale()
+        verifyEnoughStock(count)
+        this.stock.value = this.stock.value.minus(count)
+    }
+
+    fun adjustStockForCancel(count: BigDecimal) {
+        verifyAvailableForSale()
+        this.stock.value = this.stock.value.plus(count)
     }
 }

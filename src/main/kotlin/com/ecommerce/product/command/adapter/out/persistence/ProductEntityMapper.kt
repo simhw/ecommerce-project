@@ -12,6 +12,7 @@ import org.mapstruct.Mapping
     uses = [ProductStockEntityMapper::class]
 )
 interface ProductEntityMapper {
+    @Mapping(target = "stock", ignore = true)
     fun toProductEntity(domain: Product): ProductEntity
 
     fun toProduct(entity: ProductEntity): Product

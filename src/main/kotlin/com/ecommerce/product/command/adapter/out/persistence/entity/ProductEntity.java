@@ -18,16 +18,26 @@ public class ProductEntity extends BaseEntity {
     @Column(name = "product_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
+
     private String description;
+
     @Embedded
     @AttributeOverride(name = "amount", column = @Column(name = "price_amount"))
     private Money price;
+
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
-    @OneToOne(mappedBy = "product")
+
+    @OneToOne(mappedBy = "product", cascade = CascadeType.PERSIST)
     private ProductStockEntity stock;
 
     protected ProductEntity() {
+    }
+
+    public void setStock(ProductStockEntity stock) {
+        this.stock = stock;
+        stock.setProduct(this);
     }
 }
