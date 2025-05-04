@@ -59,15 +59,13 @@ class Order(
 
     /**
      * 상품 재고 감소
-     * 1-1. ✅상품의 재고가 주문 수량보다 많은지 확인한다.
-     * 1-2. 재고가 있는 경우 재고를 차감한다.(event) - before commit
      */
-    private fun adjustProductStock() {
-        items?.forEach {
-            it.product.verifyEnoughStock(it.quantity)
-            it.product.adjustStock(-it.quantity)
-        }
-    }
+    private fun adjustProductStock() = items?.map { it.product.adjustStockForSale(it.quantity) }
+
+    /**
+     * 상품 재고 원복
+     */
+    private fun restoreProductStock() = items?.map { it.product.adjustStockForCancel(it.quantity) }
 
     /**
      * 쿠폰 적용 및 할인 금액 계산
@@ -81,16 +79,6 @@ class Order(
         coupon.isSatisfyCondition(this.totalAmounts)
         this.totalDiscountAmounts = coupon.calculateDiscountAmount(totalAmounts)
         userCoupon.used()
-    }
-
-    /**
-     * order → product
-     * 상품 재고 원복
-     */
-    private fun restoreProductStock() {
-        items?.forEach {
-            it.product.adjustStock(it.quantity)
-        }
     }
 
     private fun ordered() {

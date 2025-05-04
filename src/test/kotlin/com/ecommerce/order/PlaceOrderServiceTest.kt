@@ -1,4 +1,4 @@
-package com.ecommerce.order.command.domain.service
+package com.ecommerce.order
 
 import com.ecommerce.common.model.Address
 import com.ecommerce.common.model.DateTimePeriod
@@ -6,6 +6,7 @@ import com.ecommerce.common.model.Money
 import com.ecommerce.coupon.domain.model.PercentDiscountCoupon
 import com.ecommerce.order.command.application.`in`.PlaceOrderCommand
 import com.ecommerce.order.command.application.out.SaveOrderPort
+import com.ecommerce.order.command.domain.service.PlaceOrderService
 import com.ecommerce.product.command.application.out.LoadProductPort
 import com.ecommerce.product.command.application.out.SaveProductPort
 import com.ecommerce.product.command.domain.model.Product

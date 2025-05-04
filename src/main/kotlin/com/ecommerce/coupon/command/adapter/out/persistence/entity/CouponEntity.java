@@ -4,9 +4,11 @@ import com.ecommerce.common.BaseEntity;
 import com.ecommerce.common.model.DateTimePeriod;
 import com.ecommerce.common.model.Money;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 @Entity
 @Table(name = "coupon")
 @DiscriminatorColumn(name = "discount_type")
@@ -14,8 +16,11 @@ import lombok.Getter;
 public abstract class CouponEntity extends BaseEntity {
     @Id
     @Column(name = "coupon_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
+
     private String description;
 
     // 최소 주문 금액

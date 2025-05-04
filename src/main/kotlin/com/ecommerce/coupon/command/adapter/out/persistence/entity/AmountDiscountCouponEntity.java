@@ -1,5 +1,6 @@
 package com.ecommerce.coupon.command.adapter.out.persistence.entity;
 
+import com.ecommerce.common.model.DateTimePeriod;
 import com.ecommerce.common.model.Money;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,5 +18,20 @@ public class AmountDiscountCouponEntity extends CouponEntity {
     private Money amount;
 
     protected AmountDiscountCouponEntity() {
+    }
+
+    @Builder
+    public AmountDiscountCouponEntity(
+            Long id,
+            String name,
+            String description,
+            Money minOrderAmount,
+            Money maxDiscountAmount,
+            DateTimePeriod issueOfPeriod,
+            DateTimePeriod useOfPeriod,
+            Money amount
+    ) {
+        super(id, name, description, minOrderAmount, maxDiscountAmount, issueOfPeriod, useOfPeriod);
+        this.amount = amount;
     }
 }

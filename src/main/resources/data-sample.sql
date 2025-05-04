@@ -45,3 +45,4 @@ insert into user_coupon (user_coupon_id, coupon_id, user_id, created_at, updated
 values (2, 1, 2, '2025-01-01 00:00:00', '2025-01-01 00:00:00');
 insert into user_coupon (user_coupon_id, coupon_id, user_id, created_at, updated_at)
 values (3, 2, 2, '2025-01-01 00:00:00', '2025-01-01 00:00:00');
+

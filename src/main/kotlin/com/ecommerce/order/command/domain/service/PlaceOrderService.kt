@@ -32,7 +32,7 @@ class PlaceOrderService(
         val order = Order.of(user, command.address, items)
         order.place(userCoupon)
 
-        items.forEach { saveProductPort.saveProduct(it.product) }
+        items.forEach { saveProductPort.saveStock(it.product.stock) }
         userCoupon?.let { saveUserCouponPort.saveUserCoupon(it) }
 
         saveOrderPort.saveOrder(order)
