@@ -9,10 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Builder
 @AllArgsConstructor
 @Entity
 @Table(name = "orders")
@@ -32,8 +33,8 @@ public class OrderEntity extends BaseEntity {
     @AttributeOverride(name = "city", column = @Column(name = "shipping_city"))
     private Address address;
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderLineItemEntity> items;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
+    private List<OrderLineItemEntity> items = new ArrayList<>();
 
     @Embedded
     @AttributeOverride(name = "amount", column = @Column(name = "total_amounts"))
@@ -46,5 +47,30 @@ public class OrderEntity extends BaseEntity {
     private OrderStatus status;
 
     protected OrderEntity() {
+    }
+
+    @Builder
+    public OrderEntity(LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt,
+                       Long id, String number, Long userId, Address address, List<OrderLineItemEntity> items,
+                       Money totalAmounts, Money totalDiscountAmounts, OrderStatus status) {
+        super(createdAt, updatedAt, deletedAt);
+        this.id = id;
+        this.number = number;
+        this.userId = userId;
+        this.address = address;
+        this.items = items;
+        this.totalAmounts = totalAmounts;
+        this.totalDiscountAmounts = totalDiscountAmounts;
+        this.status = status;
+    }
+
+    public void addItem(OrderLineItemEntity item) {
+        this.items.add(item);
+        item.setOrder(this);
+    }
+
+    public void setItems(List<OrderLineItemEntity> items) {
+        this.items = items;
+        items.forEach(it -> it.setOrder(this));
     }
 }

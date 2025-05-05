@@ -1,6 +1,6 @@
 package com.ecommerce.usercoupon.command.domain.model
 
-import com.ecommerce.coupon.domain.model.Coupon
+import com.ecommerce.coupon.command.domain.model.Coupon
 import java.time.LocalDateTime
 
 class UserCoupon(

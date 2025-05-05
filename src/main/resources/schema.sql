@@ -109,15 +109,3 @@ create table `order_line_item`
     product_id         bigint,
     primary key (order_line_item_id)
 );
-
-
---
--- create view `best_product_view` as
--- select product_id, sum(product_id) as count
--- from orders as o
---          left join order_line_item as oli on o.order_id = oli.order_id
--- where o.status = 'PAID'
---   and o.created_at between dateadd(now() interval -3 day) and now()
--- group by oli.product_id
--- order by count desc
--- limit 100

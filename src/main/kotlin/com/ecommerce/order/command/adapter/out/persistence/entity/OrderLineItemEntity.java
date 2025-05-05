@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
@@ -32,10 +33,12 @@ public class OrderLineItemEntity {
     @AttributeOverride(name = "amount", column = @Column(name = "item_amount"))
     private Money amount;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private OrderEntity order;
 
     protected OrderLineItemEntity() {
     }
+
 }

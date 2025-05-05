@@ -1,17 +1,16 @@
 spring:
   application:
     name: ecommerce-project
-
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3307/ecommerce
     username: user
     password: password
 
-#  h2:
-#    console:
-#      enabled: true
-#      path: /h2-console
+  #  h2:
+  #    console:
+  #      enabled: true
+  #      path: /h2-console
   sql:
     init:
       mode: always
@@ -22,6 +21,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc.batch_size: 30
 logging:
   level:
     org.hibernate.SQL: debug

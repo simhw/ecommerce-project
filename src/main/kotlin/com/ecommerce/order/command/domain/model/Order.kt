@@ -76,7 +76,7 @@ class Order(
     private fun applyCoupon(userCoupon: UserCoupon) {
         val coupon = userCoupon.coupon
         coupon.verifyPeriodOfUse()
-        coupon.isSatisfyCondition(this.totalAmounts)
+        coupon.isSatisfyCondition(totalAmounts)
         this.totalDiscountAmounts = coupon.calculateDiscountAmount(totalAmounts)
         userCoupon.used()
     }
