@@ -3,7 +3,7 @@ package com.ecommerce.usercoupon
 import com.ecommerce.common.model.DateTimePeriod
 import com.ecommerce.common.model.Money
 import com.ecommerce.coupon.command.application.port.out.LoadCouponPort
-import com.ecommerce.coupon.domain.model.PercentDiscountCoupon
+import com.ecommerce.coupon.command.domain.model.PercentDiscountCoupon
 import com.ecommerce.user.application.out.LoadUserPort
 import com.ecommerce.user.domain.model.User
 import com.ecommerce.usercoupon.command.application.`in`.IssueCouponCommand

@@ -1,4 +1,4 @@
-package com.ecommerce.coupon.domain.model
+package com.ecommerce.coupon.command.domain.model
 
 import com.ecommerce.common.model.Money
 import com.ecommerce.common.model.DateTimePeriod
