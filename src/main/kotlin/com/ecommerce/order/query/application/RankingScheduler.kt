@@ -12,7 +12,9 @@ class RankingScheduler(
     private val orderQueryService: OrderQueryService,
     private val redissonClient: RedissonClient
 ) {
-    private val TOP_SELLER_KEY = "top:selling:products"
+    companion object {
+        const val TOP_SELLER_KEY = "top:selling:products"
+    }
 
     /**
      * 3일 동안 가장 많이 판매된 상품 집계
@@ -21,10 +23,10 @@ class RankingScheduler(
     fun updateTopSellerRanking() {
         val criteria = SearchTopSellerCriteria(LocalDate.now().minusDays(3), LocalDate.now())
         val topSellers = orderQueryService.searchTopSellers(criteria)
-        val zSet: RScoredSortedSet<String> = redissonClient.getScoredSortedSet(TOP_SELLER_KEY)
+        val zSet: RScoredSortedSet<Long> = redissonClient.getScoredSortedSet(TOP_SELLER_KEY)
 
         // 랭킹 초기화
         zSet.clear()
-        topSellers?.map { zSet.add(it.totalQuantity.toDouble(), it.productId.toString()) }
+        topSellers?.map { zSet.add(it.totalQuantity.toDouble(), it.productId) }
     }
 }

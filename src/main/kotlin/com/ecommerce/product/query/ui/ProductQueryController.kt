@@ -19,11 +19,12 @@ class ProductQueryController(
     }
 
     @GetMapping("/best")
-    fun searchBestProducts(): List<ProductView> {
-        return listOfNotNull()
+    fun searchTopSellerProducts(pageable: Pageable): SearchProductResponse {
+        val result = productQueryService.searchTopSellerProduct(pageable)
+        return SearchProductResponse(result)
     }
 }
 
 class SearchProductResponse(
-    val products: List<ProductView>
+    val products: List<ProductView?>
 )

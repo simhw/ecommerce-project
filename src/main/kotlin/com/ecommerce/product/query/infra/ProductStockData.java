@@ -1,4 +1,4 @@
-package com.ecommerce.product.query.application;
+package com.ecommerce.product.query.infra;
 
 import jakarta.persistence.*;
 
