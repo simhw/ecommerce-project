@@ -15,16 +15,23 @@ abstract class Coupon(
     private var useOfPeriod: DateTimePeriod,
     private var issueOfPeriod: DateTimePeriod,
 ) {
-    abstract fun calculateDiscountAmount(price: Money): Money
-    fun isSatisfyCondition(amount: Money) {
-        if (minOrderAmount.amount > amount.amount) {
-            throw IllegalArgumentException("invalid amount")
+    abstract fun calculateDiscountAmount(amount: Money): Money
+
+    fun isSatisfyCondition(amount: Money): Boolean {
+        verifyPeriodOfUse()
+        verifyMinOrderAmount(amount)
+        return true;
+    }
+
+    private fun verifyPeriodOfUse() {
+        if (!useOfPeriod.isWithin(LocalDateTime.now())) {
+            throw IllegalArgumentException("not valid period of use")
         }
     }
 
-    fun verifyPeriodOfUse() {
-        if (!useOfPeriod.isWithin(LocalDateTime.now())) {
-            throw IllegalArgumentException("not valid period of use")
+    private fun verifyMinOrderAmount(amount: Money) {
+        if (minOrderAmount.amount > amount.amount) {
+            throw IllegalArgumentException("invalid amount")
         }
     }
 
@@ -45,11 +52,15 @@ class PercentDiscountCoupon(
     issueOfPeriod: DateTimePeriod,
     private val percent: BigDecimal
 ) : Coupon(id, name, description, minOrderAmount, maxDiscountAmount, useOfPeriod, issueOfPeriod) {
-    override fun calculateDiscountAmount(price: Money): Money {
-        val discounted = price.multiply(this.percent)
-        return if (discounted.isLessThan(maxDiscountAmount))
-            discounted
-        else maxDiscountAmount
+    override fun calculateDiscountAmount(amount: Money): Money {
+        if (!isSatisfyCondition(amount)) {
+            return Money.ZERO
+        }
+        val discountedAmount = amount.multiply(this.percent)
+        return if (discountedAmount.isLessThan(maxDiscountAmount))
+            discountedAmount
+        else
+            maxDiscountAmount
     }
 }
 
@@ -63,10 +74,10 @@ class AmountDiscountCoupon(
     issueOfPeriod: DateTimePeriod,
     private val amount: Money
 ) : Coupon(id, name, description, minOrderAmount, maxDiscountAmount, useOfPeriod, issueOfPeriod) {
-    override fun calculateDiscountAmount(price: Money): Money {
-        val discounted = this.amount
-        return if (discounted.isLessThan(maxDiscountAmount))
-            discounted
-        else maxDiscountAmount
+    override fun calculateDiscountAmount(amount: Money): Money {
+        if (!isSatisfyCondition(amount)) {
+            return Money.ZERO
+        }
+        return this.amount
     }
 }

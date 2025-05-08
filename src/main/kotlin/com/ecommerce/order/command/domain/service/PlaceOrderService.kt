@@ -29,13 +29,14 @@ class PlaceOrderService(
         val products = command.items.map { loadProductPort.loadProductBy(it.productId) }
         val items = command.items.mapIndexed { index, it -> OrderLineItem.of(products[index], it.quantity) }
         val userCoupon = command.userCouponId?.let { loadUserCouponPort.loadUserCouponBy(it) }
+
         val order = Order.of(user, command.address, items)
         order.place(userCoupon)
 
         items.forEach { saveProductPort.saveStock(it.product.stock) }
         userCoupon?.let { saveUserCouponPort.saveUserCoupon(it) }
-
         saveOrderPort.saveOrder(order)
+
         return OrderInfo.from(order)
     }
 }

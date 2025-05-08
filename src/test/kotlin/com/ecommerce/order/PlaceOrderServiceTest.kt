@@ -75,7 +75,7 @@ class PlaceOrderServiceTest {
         every { loadProductPort.loadProductBy(1L) } returns product1
         every { loadProductPort.loadProductBy(2L) } returns product2
         every { saveOrderPort.saveOrder(any()) } just Runs
-        every { saveProductPort.saveProduct(any()) } just Runs
+        every { saveProductPort.saveStock(any()) } just Runs
 
         val command = PlaceOrderCommand(
             1L,
@@ -142,7 +142,7 @@ class PlaceOrderServiceTest {
         every { loadProductPort.loadProductBy(2L) } returns product2
         every { loadUserCouponPort.loadUserCouponBy(1L) } returns userCoupon
         every { saveOrderPort.saveOrder(any()) } just Runs
-        every { saveProductPort.saveProduct(any()) } just Runs
+        every { saveProductPort.saveStock(any()) } just Runs
         every { saveUserCouponPort.saveUserCoupon(any()) } just Runs
 
         val command = PlaceOrderCommand(

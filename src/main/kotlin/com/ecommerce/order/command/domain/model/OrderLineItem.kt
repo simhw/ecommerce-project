@@ -23,5 +23,25 @@ class OrderLineItem(
         }
     }
 
-    fun calculateAmount(): Money = price.multiply(quantity)
+    /**
+     * 주문 금액 계산
+     */
+    fun calculateAmount(): Money {
+        return price.multiply(quantity)
+    }
+
+    /**
+     * 상품 예약
+     */
+    fun reserveProduct() {
+        product.reserve(quantity)
+    }
+
+    /**
+     * 상품 취소
+     */
+    fun cancelProduct() {
+        product.cancel(quantity)
+    }
+
 }
