@@ -1,6 +1,7 @@
 package com.ecommerce.usercoupon.command.domain.model
 
-import com.ecommerce.coupon.domain.model.Coupon
+import com.ecommerce.common.model.Money
+import com.ecommerce.coupon.command.domain.model.Coupon
 import java.time.LocalDateTime
 
 class UserCoupon(
@@ -17,14 +18,26 @@ class UserCoupon(
         }
     }
 
-    fun used() {
-        if (status != UserCouponStatus.UNUSED) {
-            throw IllegalStateException("can not use coupon: $status")
-        }
+    /**
+     * 쿠폰 사용
+     */
+    fun apply(amount: Money): Money {
+        used()
+        return coupon.calculateDiscountAmount(amount)
+    }
+
+    private fun used() {
+        verifyUsableStatus()
         this.status = UserCouponStatus.USED
     }
 
-    fun expired() {
+    private fun expired() {
         this.status = UserCouponStatus.EXPIRED
+    }
+
+    private fun verifyUsableStatus() {
+        if (status != UserCouponStatus.UNUSED) {
+            throw IllegalStateException("can not use coupon: $status")
+        }
     }
 }

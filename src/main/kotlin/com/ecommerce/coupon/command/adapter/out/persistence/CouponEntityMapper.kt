@@ -3,9 +3,9 @@ package com.ecommerce.coupon.command.adapter.out.persistence
 import com.ecommerce.coupon.command.adapter.out.persistence.entity.AmountDiscountCouponEntity
 import com.ecommerce.coupon.command.adapter.out.persistence.entity.CouponEntity
 import com.ecommerce.coupon.command.adapter.out.persistence.entity.PercentDiscountCouponEntity
-import com.ecommerce.coupon.domain.model.AmountDiscountCoupon
-import com.ecommerce.coupon.domain.model.Coupon
-import com.ecommerce.coupon.domain.model.PercentDiscountCoupon
+import com.ecommerce.coupon.command.domain.model.AmountDiscountCoupon
+import com.ecommerce.coupon.command.domain.model.Coupon
+import com.ecommerce.coupon.command.domain.model.PercentDiscountCoupon
 import org.mapstruct.Mapper
 import org.mapstruct.ReportingPolicy
 import org.mapstruct.SubclassExhaustiveStrategy

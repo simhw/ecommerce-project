@@ -22,9 +22,10 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
-
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+//    redis
+    implementation("org.redisson:redisson-spring-boot-starter:3.25.2")
 //    mapper
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
     kapt("org.mapstruct:mapstruct-processor:1.5.5.Final")
@@ -32,17 +33,16 @@ dependencies {
 //    jpa
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 //    querydsl
-    implementation ("com.querydsl:querydsl-jpa:5.0.0:jakarta")
-//    kotlin 작성 시 kapt 변경
-    annotationProcessor("com.querydsl:querydsl-apt:5.0.0:jakarta")
-    annotationProcessor("jakarta.annotation:jakarta.annotation-api")
-    annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+    implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+    kapt("com.querydsl:querydsl-apt:5.0.0:jakarta")
+    kapt("jakarta.annotation:jakarta.annotation-api")
+    kapt("jakarta.persistence:jakarta.persistence-api")
+
 //    lombok
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-//    h2(test)
-    runtimeOnly("com.h2database:h2")
-
+    runtimeOnly("com.mysql:mysql-connector-j")
+//    test
     testImplementation("io.mockk:mockk:1.13.4")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
@@ -56,11 +56,9 @@ allOpen {
 }
 
 // querydsl build option
-val querydslDir = "src/main/generated"
+val querydslDir =  "/generated/source/kapt/main"
 
-sourceSets {
-    getByName("main").java.srcDirs(querydslDir)
-}
+sourceSets["main"].java.srcDir(querydslDir)
 
 tasks.withType<JavaCompile> {
     options.generatedSourceOutputDirectory.set(file(querydslDir))

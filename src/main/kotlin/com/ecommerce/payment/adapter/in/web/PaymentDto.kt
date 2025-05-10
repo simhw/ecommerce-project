@@ -1,6 +1,9 @@
 package com.ecommerce.payment.adapter.`in`.web
 
+import java.math.BigDecimal
+import java.time.LocalDateTime
+
 data class PaymentDto(
-    val id: Long,
-    val amount: Long,
+    val amount: BigDecimal,
+    val createdAt: LocalDateTime
 )

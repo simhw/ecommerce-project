@@ -17,6 +17,7 @@ public class DateTimePeriod {
     }
 
     public boolean isWithin(LocalDateTime dateTime) {
-        return startDateTime.isBefore(dateTime) && endDateTime.isAfter(dateTime);
+        return startDateTime.isEqual(dateTime) || endDateTime.isEqual(dateTime) ||
+                (startDateTime.isBefore(dateTime) && endDateTime.isAfter(dateTime));
     }
 }
