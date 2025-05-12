@@ -30,14 +30,6 @@ public class ProductEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
-    @OneToOne(mappedBy = "product", cascade = CascadeType.PERSIST)
-    private ProductStockEntity stock;
-
     protected ProductEntity() {
-    }
-
-    public void setStock(ProductStockEntity stock) {
-        this.stock = stock;
-        stock.setProduct(this);
     }
 }

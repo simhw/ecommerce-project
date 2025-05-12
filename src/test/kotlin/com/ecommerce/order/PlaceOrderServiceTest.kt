@@ -7,15 +7,14 @@ import com.ecommerce.coupon.command.domain.model.PercentDiscountCoupon
 import com.ecommerce.order.command.application.`in`.PlaceOrderCommand
 import com.ecommerce.order.command.application.out.SaveOrderPort
 import com.ecommerce.order.command.domain.service.PlaceOrderService
-import com.ecommerce.product.command.application.out.LoadProductPort
-import com.ecommerce.product.command.application.out.SaveProductPort
+import com.ecommerce.product.command.application.out.ProductPort
+import com.ecommerce.product.command.application.out.StockPort
 import com.ecommerce.product.command.domain.model.Product
 import com.ecommerce.product.command.domain.model.ProductStatus
-import com.ecommerce.product.command.domain.model.ProductStock
+import com.ecommerce.product.command.domain.model.Stock
 import com.ecommerce.user.application.out.LoadUserPort
 import com.ecommerce.user.domain.model.User
-import com.ecommerce.usercoupon.command.application.out.LoadUserCouponPort
-import com.ecommerce.usercoupon.command.application.out.SaveUserCouponPort
+import com.ecommerce.usercoupon.command.application.out.UserCouponPort
 import com.ecommerce.usercoupon.command.domain.model.UserCoupon
 import com.ecommerce.usercoupon.command.domain.model.UserCouponStatus
 import io.mockk.Runs
@@ -30,20 +29,13 @@ import java.time.LocalDateTime
 
 class PlaceOrderServiceTest {
     private val loadUserPort = mockk<LoadUserPort>()
-    private val loadUserCouponPort = mockk<LoadUserCouponPort>()
-    private val loadProductPort = mockk<LoadProductPort>()
+    private val userCouponPort = mockk<UserCouponPort>()
+    private val productPort = mockk<ProductPort>()
+    private val stockPort = mockk<StockPort>()
     private val saveOrderPort = mockk<SaveOrderPort>()
-    private val saveUserCouponPort = mockk<SaveUserCouponPort>()
-    private val saveProductPort = mockk<SaveProductPort>()
 
-    private val placeOrderService = PlaceOrderService(
-        loadUserPort,
-        loadUserCouponPort,
-        loadProductPort,
-        saveOrderPort,
-        saveUserCouponPort,
-        saveProductPort
-    )
+    private val placeOrderService =
+        PlaceOrderService(loadUserPort, userCouponPort, productPort, stockPort, saveOrderPort)
 
     @Test
     fun `주문 시 각 상품의 재고는 주문 수량만큼 차감된다`() {
@@ -59,7 +51,6 @@ class PlaceOrderServiceTest {
             "name",
             "description",
             price = Money.of(BigDecimal.valueOf(23800)),
-            stock = ProductStock(1L, BigDecimal.valueOf(100), LocalDateTime.now()),
             status = ProductStatus.SELL
         )
         val product2 = Product(
@@ -67,15 +58,28 @@ class PlaceOrderServiceTest {
             "name",
             "description",
             price = Money.of(BigDecimal.valueOf(18900)),
-            stock = ProductStock(2L, BigDecimal.valueOf(200), LocalDateTime.now()),
             status = ProductStatus.SELL
+        )
+        val stock1 = Stock(
+            1L,
+            BigDecimal.valueOf(100),
+            1L,
+            LocalDateTime.now()
+        )
+        val stock2 = Stock(
+            2L,
+            BigDecimal.valueOf(100),
+            2L,
+            LocalDateTime.now()
         )
 
         every { loadUserPort.loadUserBy(1L) } returns user
-        every { loadProductPort.loadProductBy(1L) } returns product1
-        every { loadProductPort.loadProductBy(2L) } returns product2
+        every { productPort.loadProductBy(1L) } returns product1
+        every { productPort.loadProductBy(2L) } returns product2
+        every { stockPort.loadStockByProductId(1L) } returns stock1
+        every { stockPort.loadStockByProductId(2L) } returns stock2
         every { saveOrderPort.saveOrder(any()) } just Runs
-        every { saveProductPort.saveStock(any()) } just Runs
+        every { stockPort.saveAllStock(any()) } just Runs
 
         val command = PlaceOrderCommand(
             1L,
@@ -91,8 +95,8 @@ class PlaceOrderServiceTest {
         placeOrderService.placeOrder(command)
 
         // then
-        assertEquals(BigDecimal.valueOf(99), product1.stock.value)
-        assertEquals(BigDecimal.valueOf(198), product2.stock.value)
+        assertEquals(BigDecimal.valueOf(99), stock1.value)
+        assertEquals(BigDecimal.valueOf(98), stock2.value)
     }
 
     @Test
@@ -109,7 +113,6 @@ class PlaceOrderServiceTest {
             "name",
             "description",
             price = Money.of(BigDecimal.valueOf(23800)),
-            stock = ProductStock(1L, BigDecimal.valueOf(100), LocalDateTime.now()),
             status = ProductStatus.SELL
         )
         val product2 = Product(
@@ -117,8 +120,19 @@ class PlaceOrderServiceTest {
             "name",
             "description",
             price = Money.of(BigDecimal.valueOf(18900)),
-            stock = ProductStock(2L, BigDecimal.valueOf(200), LocalDateTime.now()),
             status = ProductStatus.SELL
+        )
+        val stock1 = Stock(
+            1L,
+            BigDecimal.valueOf(100),
+            1L,
+            LocalDateTime.now()
+        )
+        val stock2 = Stock(
+            2L,
+            BigDecimal.valueOf(100),
+            2L,
+            LocalDateTime.now()
         )
         val coupon = PercentDiscountCoupon(
             id = 1L,
@@ -138,12 +152,14 @@ class PlaceOrderServiceTest {
         )
 
         every { loadUserPort.loadUserBy(1L) } returns user
-        every { loadProductPort.loadProductBy(1L) } returns product1
-        every { loadProductPort.loadProductBy(2L) } returns product2
-        every { loadUserCouponPort.loadUserCouponBy(1L) } returns userCoupon
+        every { productPort.loadProductBy(1L) } returns product1
+        every { productPort.loadProductBy(2L) } returns product2
+        every { stockPort.loadStockByProductId(1L) } returns stock1
+        every { stockPort.loadStockByProductId(2L) } returns stock2
+        every { userCouponPort.loadUserCouponById(1L) } returns userCoupon
         every { saveOrderPort.saveOrder(any()) } just Runs
-        every { saveProductPort.saveStock(any()) } just Runs
-        every { saveUserCouponPort.saveUserCoupon(any()) } just Runs
+        every { stockPort.saveAllStock(any()) } just Runs
+        every { userCouponPort.saveUserCoupon(any()) } just Runs
 
         val command = PlaceOrderCommand(
             1L,

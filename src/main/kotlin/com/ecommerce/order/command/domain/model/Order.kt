@@ -3,7 +3,6 @@ package com.ecommerce.order.command.domain.model
 import com.ecommerce.common.model.Address
 import com.ecommerce.common.model.Money
 import com.ecommerce.common.util.NumberUtils
-import com.ecommerce.user.domain.model.User
 import com.ecommerce.usercoupon.command.domain.model.UserCoupon
 import java.time.LocalDateTime
 
@@ -19,10 +18,10 @@ class Order(
     val createdAt: LocalDateTime
 ) {
     companion object {
-        fun of(user: User, address: Address, items: List<OrderLineItem>): Order {
+        fun of(userId: Long, address: Address, items: List<OrderLineItem>): Order {
             return Order(
                 number = NumberUtils.generateOrderNumber(),
-                userId = user.getIdOrThrow(),
+                userId = userId,
                 address = address,
                 items = items,
                 createdAt = LocalDateTime.now()
@@ -36,12 +35,10 @@ class Order(
     fun place(userCoupon: UserCoupon?) {
         this.totalAmounts = calculateTotalAmount()
         userCoupon?.let { applyCoupon(userCoupon) }
-        items.map { it.reserveProduct() }
         ordered()
     }
 
     fun cancel() {
-        items.map { it.cancelProduct() }
         canceled()
     }
 
@@ -68,7 +65,7 @@ class Order(
         if (!isNotYetShipped()) {
             throw IllegalArgumentException("can not cancel order")
         }
-        this.status = OrderStatus.ORDERED
+        this.status = OrderStatus.CANCELED
     }
 
     private fun isNotYetShipped(): Boolean {

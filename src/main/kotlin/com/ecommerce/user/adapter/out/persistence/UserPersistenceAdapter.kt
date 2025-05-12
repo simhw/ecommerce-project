@@ -11,13 +11,13 @@ class UserPersistenceAdapter(
 ) : LoadUserPort {
     override fun loadUserBy(id: Long): User {
         val userEntity = userJpaRepository.findById(id)
-            .orElseThrow { IllegalArgumentException("not found user") }
+            .orElseThrow { IllegalArgumentException("not found user id: $id") }
         return userEntityMapper.toUser(userEntity)
     }
 
     override fun loadUserBy(email: String): User {
         val userEntity = userJpaRepository.findByEmail(email)
-            .orElseThrow { IllegalArgumentException("not found user") }
+            .orElseThrow { IllegalArgumentException("not found user email: $email") }
         return userEntityMapper.toUser(userEntity)
     }
 }

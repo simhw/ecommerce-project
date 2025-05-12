@@ -7,7 +7,7 @@ import com.ecommerce.order.command.domain.model.OrderStatus
 import com.ecommerce.order.query.application.OrderQueryService
 import com.ecommerce.order.query.application.SearchTopSellerCriteria
 import com.ecommerce.product.command.adapter.out.persistence.entity.ProductEntity
-import com.ecommerce.product.command.adapter.out.persistence.entity.ProductStockEntity
+import com.ecommerce.product.command.adapter.out.persistence.entity.StockEntity
 import com.ecommerce.product.command.domain.model.ProductStatus
 import com.ecommerce.user.adapter.out.persistence.UserEntity
 import jakarta.persistence.EntityManager
@@ -40,7 +40,7 @@ class OrderQueryServiceTest(
             entityManager.persist(userEntity)
         }
         for (i in 1..100) {
-            val productStockEntity = ProductStockEntity.builder()
+            val stockEntity = StockEntity.builder()
                 .value(BigDecimal.valueOf(100))
                 .updatedAt(LocalDateTime.now())
                 .build()
@@ -50,7 +50,7 @@ class OrderQueryServiceTest(
                 .price(Money.of(BigDecimal.valueOf(10000)))
                 .status(ProductStatus.SELL)
                 .build()
-            productEntity.setStock(productStockEntity)
+            entityManager.persist(stockEntity)
             entityManager.persist(productEntity)
         }
         for (i in 1..1000) {
