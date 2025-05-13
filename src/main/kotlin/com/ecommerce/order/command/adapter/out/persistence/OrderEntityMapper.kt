@@ -21,6 +21,5 @@ interface OrderEntityMapper {
 @Mapper(componentModel = "spring")
 interface OrderLineItemEntityMapper {
     @Mapping(target = "order", ignore = true)
-    @Mapping(source = "product.id", target = "productId")
     fun toOrderLineItemEntity(orderLineItem: OrderLineItem): OrderLineItemEntity
 }

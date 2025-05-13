@@ -7,7 +7,7 @@ import com.ecommerce.coupon.command.domain.model.PercentDiscountCoupon
 import com.ecommerce.user.application.out.LoadUserPort
 import com.ecommerce.user.domain.model.User
 import com.ecommerce.usercoupon.command.application.`in`.IssueCouponCommand
-import com.ecommerce.usercoupon.command.application.out.SaveUserCouponPort
+import com.ecommerce.usercoupon.command.application.out.UserCouponPort
 import com.ecommerce.usercoupon.command.domain.service.IssueCouponService
 import io.mockk.every
 import io.mockk.mockk
@@ -20,9 +20,9 @@ import java.time.LocalDateTime
 class IssueCouponServiceTest {
     private val loadUserPort = mockk<LoadUserPort>()
     private val loadCouponPort = mockk<LoadCouponPort>()
-    private val saveUserCouponPort = mockk<SaveUserCouponPort>()
+    private val userCouponPort = mockk<UserCouponPort>()
 
-    private val issueCouponService = IssueCouponService(loadUserPort, loadCouponPort, saveUserCouponPort)
+    private val issueCouponService = IssueCouponService(loadUserPort, loadCouponPort, userCouponPort)
 
     @Test
     fun `발급이 만료된 쿠폰 발급 시 IllegalArgumentException 발생`() {
