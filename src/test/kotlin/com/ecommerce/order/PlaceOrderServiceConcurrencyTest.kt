@@ -42,7 +42,6 @@ class PlaceOrderServiceConcurrencyTest(
                         PlaceOrderCommand.OrderItem(2L, BigDecimal.valueOf(1))
                     ),
                 )
-
                 // when
                 try {
                     placeOrderService.placeOrder(command)
@@ -59,8 +58,10 @@ class PlaceOrderServiceConcurrencyTest(
         // then
         val stock1 = em.find(StockEntity::class.java, 1L).value
         val stock2 = em.find(StockEntity::class.java, 2L).value
+        val count = em.createQuery("select count(1) from OrderEntity o").singleResult
 
         assertEquals(stock1, BigDecimal.valueOf(STOCK_VALUE - THREAD_COUNT).setScale(2))
         assertEquals(stock2, BigDecimal.valueOf(STOCK_VALUE - THREAD_COUNT).setScale(2))
+        assertEquals(count, THREAD_COUNT)
     }
 }

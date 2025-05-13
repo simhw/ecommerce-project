@@ -4,23 +4,24 @@ import com.ecommerce.order.command.application.out.SaveOrderPort
 import com.ecommerce.order.command.application.`in`.OrderInfo
 import com.ecommerce.order.command.application.`in`.PlaceOrderUseCase
 import com.ecommerce.order.command.application.`in`.PlaceOrderCommand
+import com.ecommerce.order.command.domain.OrderPlacedEvent
 import com.ecommerce.order.command.domain.model.Order
 import com.ecommerce.order.command.domain.model.OrderLineItem
 import com.ecommerce.product.command.application.out.ProductPort
-import com.ecommerce.product.command.application.out.StockPort
 
 import com.ecommerce.user.application.out.LoadUserPort
 import com.ecommerce.usercoupon.command.application.out.UserCouponPort
 import jakarta.transaction.Transactional
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 
 @Service
 class PlaceOrderService(
-    val loadUserPort: LoadUserPort,
-    val userCouponPort: UserCouponPort,
-    val productPort: ProductPort,
-    val stockPort: StockPort,
-    val saveOrderPort: SaveOrderPort
+    private val loadUserPort: LoadUserPort,
+    private val userCouponPort: UserCouponPort,
+    private val productPort: ProductPort,
+    private val saveOrderPort: SaveOrderPort,
+    private val eventPublisher: ApplicationEventPublisher
 ) : PlaceOrderUseCase {
     @Transactional
     override fun placeOrder(command: PlaceOrderCommand): OrderInfo {
@@ -32,9 +33,6 @@ class PlaceOrderService(
             .map { productPort.loadProductBy(it.productId) }
             .onEach { it.verifyAvailableForSale() }
             .associateBy { it.getIdOrThrow() }
-        val stocks = command.items
-            .map { stockPort.loadStockForUpdateByProductId(it.productId) }
-            .associateBy { it.productId }
         val userCoupon = command.userCouponId?.let { userCouponPort.loadUserCouponById(it) }
 
         val order = Order.of(
@@ -46,13 +44,9 @@ class PlaceOrderService(
             }
         )
         order.place(userCoupon)
-        command.items.map {
-            val stock = stocks[it.productId] ?: throw IllegalArgumentException("not found stock")
-            println("stock.value = ${stock.value}")
-            stock.decrease(it.quantity)
-        }
+        // 주문 이벤트 발행
+        eventPublisher.publishEvent(OrderPlacedEvent(order))
 
-        stockPort.saveAllStock(stocks.values.toList())
         saveOrderPort.saveOrder(order)
         userCoupon?.let { userCouponPort.saveUserCoupon(it) }
         return OrderInfo.from(order)

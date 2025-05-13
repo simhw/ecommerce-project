@@ -24,6 +24,7 @@ import io.mockk.mockk
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
+import org.springframework.context.ApplicationEventPublisher
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -33,9 +34,10 @@ class PlaceOrderServiceTest {
     private val productPort = mockk<ProductPort>()
     private val stockPort = mockk<StockPort>()
     private val saveOrderPort = mockk<SaveOrderPort>()
+    private val eventPublisher = mockk<ApplicationEventPublisher>()
 
     private val placeOrderService =
-        PlaceOrderService(loadUserPort, userCouponPort, productPort, stockPort, saveOrderPort)
+        PlaceOrderService(loadUserPort, userCouponPort, productPort, saveOrderPort, eventPublisher)
 
     @Test
     fun `주문 시 각 상품의 재고는 주문 수량만큼 차감된다`() {
