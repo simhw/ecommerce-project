@@ -11,9 +11,10 @@ import com.ecommerce.product.command.application.out.ProductPort
 
 import com.ecommerce.user.application.out.LoadUserPort
 import com.ecommerce.usercoupon.command.application.out.UserCouponPort
-import jakarta.transaction.Transactional
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronizationManager
 
 @Service
 class PlaceOrderService(
@@ -25,6 +26,7 @@ class PlaceOrderService(
 ) : PlaceOrderUseCase {
     @Transactional
     override fun placeOrder(command: PlaceOrderCommand): OrderInfo {
+        println("Start PlaceOrderUseCase txName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
         // 유효 회원 검증
         val user = loadUserPort.loadUserBy(command.userId)
             .also { it.verifyActiveUser() }
@@ -44,11 +46,9 @@ class PlaceOrderService(
             }
         )
         order.place(userCoupon)
-        // 주문 이벤트 발행
-        eventPublisher.publishEvent(OrderPlacedEvent(order))
-
         saveOrderPort.saveOrder(order)
         userCoupon?.let { userCouponPort.saveUserCoupon(it) }
+        eventPublisher.publishEvent(OrderPlacedEvent(order))
         return OrderInfo.from(order)
     }
 }

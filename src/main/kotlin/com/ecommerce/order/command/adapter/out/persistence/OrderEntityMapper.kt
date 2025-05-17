@@ -14,7 +14,6 @@ import org.mapstruct.Mapping
 interface OrderEntityMapper {
     fun toOrderEntity(order: Order): OrderEntity
 
-    @Mapping(target = "items", ignore = true)
     fun toOrder(orderEntity: OrderEntity): Order
 }
 
@@ -22,4 +21,6 @@ interface OrderEntityMapper {
 interface OrderLineItemEntityMapper {
     @Mapping(target = "order", ignore = true)
     fun toOrderLineItemEntity(orderLineItem: OrderLineItem): OrderLineItemEntity
+
+    fun toOrderLineItem(orderLineItemEntity: OrderLineItemEntity): OrderLineItem
 }

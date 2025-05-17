@@ -12,11 +12,12 @@ data class OrderInfo(
 ) {
     companion object {
         fun from(order: Order) = OrderInfo(
-            number = order.number ?: "",
+            number = order.number,
             totalAmounts = order.totalAmounts,
             totalDiscountAmounts = order.totalDiscountAmounts,
             createdAt = order.createdAt
         )
     }
 }
+
 

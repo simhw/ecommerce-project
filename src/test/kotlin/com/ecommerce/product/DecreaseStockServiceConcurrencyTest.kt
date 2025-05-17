@@ -1,16 +1,13 @@
-package com.ecommerce.order
+package com.ecommerce.product
 
-import com.ecommerce.common.model.Address
 import com.ecommerce.common.model.Money
-import com.ecommerce.order.command.application.`in`.PlaceOrderCommand
-import com.ecommerce.order.command.domain.service.PlaceOrderService
 import com.ecommerce.product.command.adapter.out.persistence.ProductJpaRepository
 import com.ecommerce.product.command.adapter.out.persistence.StockJpaRepository
 import com.ecommerce.product.command.adapter.out.persistence.entity.ProductEntity
 import com.ecommerce.product.command.adapter.out.persistence.entity.StockEntity
+import com.ecommerce.product.command.application.`in`.DecreaseStockCommand
 import com.ecommerce.product.command.domain.model.ProductStatus
-import com.ecommerce.user.adapter.out.persistence.UserEntity
-import com.ecommerce.user.adapter.out.persistence.UserJpaRepository
+import com.ecommerce.product.command.domain.service.DecreaseStockService
 import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -23,28 +20,19 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 
 @SpringBootTest
-class PlaceOrderServiceConcurrencyTest(
-    @Autowired val placeOrderService: PlaceOrderService,
-    @Autowired val userJpaRepository: UserJpaRepository,
+class DecreaseStockServiceConcurrencyTest(
+    @Autowired val decreaseStockService: DecreaseStockService,
     @Autowired val productJpaRepository: ProductJpaRepository,
     @Autowired val stockJpaRepository: StockJpaRepository,
     @Autowired val em: EntityManager
 ) {
     companion object {
-        const val THREAD_COUNT = 30
-        const val STOCK_VALUE = 20L
+        const val THREAD_COUNT = 15
+        const val STOCK_VALUE = 10L
     }
 
     @BeforeEach
     fun init() {
-        for (i in 1..THREAD_COUNT) {
-            userJpaRepository.save(
-                UserEntity.builder()
-                    .name("username${i}")
-                    .email("username@email.com")
-                    .build()
-            )
-        }
         for (i in 1..2) {
             productJpaRepository.save(
                 ProductEntity.builder()
@@ -67,24 +55,23 @@ class PlaceOrderServiceConcurrencyTest(
     }
 
     @Test
-    fun `동시에 30명이 같은 상품 주문 시 재고는 정합성을 유지해야한다`() {
+    fun `동시에 재고 차감 시 재고는 정합성을 유지해야한다`() {
         val executor = Executors.newFixedThreadPool(THREAD_COUNT)
         val latch = CountDownLatch(THREAD_COUNT)
 
         for (i in 1..THREAD_COUNT) {
             executor.submit {
-                // given
-                val command = PlaceOrderCommand(
-                    userId = i.toLong(),
-                    address = Address("street", "city"),
-                    items = listOf(
-                        PlaceOrderCommand.OrderItem(1L, BigDecimal.valueOf(1)),
-                        PlaceOrderCommand.OrderItem(2L, BigDecimal.valueOf(1))
+                val command = DecreaseStockCommand(
+                    "ORD-TEST",
+                    1L,
+                    listOf(
+                        DecreaseStockCommand.OrderItem(1L, BigDecimal.valueOf(1)),
+                        DecreaseStockCommand.OrderItem(2L, BigDecimal.valueOf(1))
                     ),
                 )
                 // when
                 try {
-                    placeOrderService.placeOrder(command)
+                    decreaseStockService.decreaseStock(command)
                 } catch (e: Exception) {
                     println("error ${e.message}")
                 } finally {
@@ -96,7 +83,10 @@ class PlaceOrderServiceConcurrencyTest(
         executor.shutdown();
 
         // then
-        val result = em.createQuery("select count(1) from OrderEntity o").singleResult
-        assertEquals(result.toString().toInt(), THREAD_COUNT)
+        val stock1 = em.find(StockEntity::class.java, 1L).value
+        val stock2 = em.find(StockEntity::class.java, 2L).value
+
+        assertEquals(stock1, BigDecimal.valueOf(STOCK_VALUE - THREAD_COUNT).setScale(2))
+        assertEquals(stock2, BigDecimal.valueOf(STOCK_VALUE - THREAD_COUNT).setScale(2))
     }
 }

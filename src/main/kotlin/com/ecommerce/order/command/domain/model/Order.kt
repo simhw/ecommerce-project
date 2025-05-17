@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 
 class Order(
     val id: Long? = null,
-    var number: String,
+    val number: String,
     val userId: Long,
     var address: Address,
     val items: List<OrderLineItem>,
@@ -38,12 +38,25 @@ class Order(
         ordered()
     }
 
+    fun fail() {
+        if (!isNotYetPayed()) {
+            throw IllegalArgumentException("already paid order $number")
+        }
+        failed()
+    }
+
     fun cancel() {
+        if (!isNotYetShipped()) {
+            throw IllegalArgumentException("can not cancel order")
+        }
         canceled()
     }
 
-    fun paid() {
-        status = OrderStatus.PAID
+    fun pay() {
+        if (!isNotYetShipped()) {
+            throw IllegalArgumentException("can not cancel order")
+        }
+        paid()
     }
 
     /**
@@ -62,10 +75,19 @@ class Order(
     }
 
     private fun canceled() {
-        if (!isNotYetShipped()) {
-            throw IllegalArgumentException("can not cancel order")
-        }
         this.status = OrderStatus.CANCELED
+    }
+
+    private fun failed() {
+        this.status = OrderStatus.FAILED
+    }
+
+    private fun paid() {
+        this.status = OrderStatus.PAID
+    }
+
+    private fun isNotYetPayed(): Boolean {
+        return status === OrderStatus.ORDERED
     }
 
     private fun isNotYetShipped(): Boolean {
