@@ -24,7 +24,7 @@ class PayOrderService(
     override fun payOrder(command: PayOrderCommand): PaymentInfo {
         val user = loadUserPort.loadUserBy(command.userId)
         val account = loadAccountPort.loadAccountBy(user)
-        val order = loadOrderPort.loadOrderBy(command.orderNumber)
+        val order = loadOrderPort.loadOrderByNumber(command.orderNumber)
 
         val payment = Payment.of(order, user)
         payment.pay(account)

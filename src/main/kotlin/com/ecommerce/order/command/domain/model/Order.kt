@@ -3,13 +3,12 @@ package com.ecommerce.order.command.domain.model
 import com.ecommerce.common.model.Address
 import com.ecommerce.common.model.Money
 import com.ecommerce.common.util.NumberUtils
-import com.ecommerce.user.domain.model.User
 import com.ecommerce.usercoupon.command.domain.model.UserCoupon
 import java.time.LocalDateTime
 
 class Order(
     val id: Long? = null,
-    var number: String,
+    val number: String,
     val userId: Long,
     var address: Address,
     val items: List<OrderLineItem>,
@@ -19,10 +18,10 @@ class Order(
     val createdAt: LocalDateTime
 ) {
     companion object {
-        fun of(user: User, address: Address, items: List<OrderLineItem>): Order {
+        fun of(userId: Long, address: Address, items: List<OrderLineItem>): Order {
             return Order(
                 number = NumberUtils.generateOrderNumber(),
-                userId = user.getIdOrThrow(),
+                userId = userId,
                 address = address,
                 items = items,
                 createdAt = LocalDateTime.now()
@@ -36,17 +35,28 @@ class Order(
     fun place(userCoupon: UserCoupon?) {
         this.totalAmounts = calculateTotalAmount()
         userCoupon?.let { applyCoupon(userCoupon) }
-        items.map { it.reserveProduct() }
         ordered()
     }
 
+    fun fail() {
+        if (!isNotYetPayed()) {
+            throw IllegalArgumentException("already paid order $number")
+        }
+        failed()
+    }
+
     fun cancel() {
-        items.map { it.cancelProduct() }
+        if (!isNotYetShipped()) {
+            throw IllegalArgumentException("can not cancel order")
+        }
         canceled()
     }
 
-    fun paid() {
-        status = OrderStatus.PAID
+    fun pay() {
+        if (!isNotYetShipped()) {
+            throw IllegalArgumentException("can not cancel order")
+        }
+        paid()
     }
 
     /**
@@ -65,10 +75,19 @@ class Order(
     }
 
     private fun canceled() {
-        if (!isNotYetShipped()) {
-            throw IllegalArgumentException("can not cancel order")
-        }
-        this.status = OrderStatus.ORDERED
+        this.status = OrderStatus.CANCELED
+    }
+
+    private fun failed() {
+        this.status = OrderStatus.FAILED
+    }
+
+    private fun paid() {
+        this.status = OrderStatus.PAID
+    }
+
+    private fun isNotYetPayed(): Boolean {
+        return status === OrderStatus.ORDERED
     }
 
     private fun isNotYetShipped(): Boolean {

@@ -2,7 +2,6 @@ package com.ecommerce.order
 
 import com.ecommerce.account.adapter.out.persistence.AccountEntity
 import com.ecommerce.common.model.Address
-import com.ecommerce.common.model.DateTimePeriod
 import com.ecommerce.common.model.Money
 import com.ecommerce.coupon.command.adapter.out.persistence.entity.PercentDiscountCouponEntity
 import com.ecommerce.order.command.adapter.out.persistence.entity.OrderEntity
@@ -10,7 +9,7 @@ import com.ecommerce.order.command.application.`in`.PlaceOrderCommand
 import com.ecommerce.order.command.domain.model.OrderStatus
 import com.ecommerce.order.command.domain.service.PlaceOrderService
 import com.ecommerce.product.command.adapter.out.persistence.entity.ProductEntity
-import com.ecommerce.product.command.adapter.out.persistence.entity.ProductStockEntity
+import com.ecommerce.product.command.adapter.out.persistence.entity.StockEntity
 import com.ecommerce.product.command.domain.model.ProductStatus
 import com.ecommerce.user.adapter.out.persistence.UserEntity
 import com.ecommerce.usercoupon.command.adapter.out.persistence.UserCouponEntity
@@ -28,38 +27,47 @@ import java.time.LocalDateTime
 
 @SpringBootTest
 @Transactional
-class PlaceOrderIntegrationTest(
+class PlaceOrderServiceIntegrationTest(
     @Autowired val placeOrderService: PlaceOrderService,
-    @Autowired val entityManager: EntityManager
+    @Autowired val em: EntityManager
 ) {
     @BeforeEach
     fun init() {
-        val userEntity = UserEntity.builder()
-            .name("username")
-            .email("email")
-            .build()
-        val accountEntity = AccountEntity.builder()
-            .balance(Money.ZERO)
-            .user(userEntity)
-            .build()
-        val productStockEntity = ProductStockEntity.builder()
-            .value(BigDecimal.valueOf(100))
-            .updatedAt(LocalDateTime.now())
-            .build()
-        val productEntity = ProductEntity.builder()
-            .name("product")
-            .description("description")
-            .price(Money.of(BigDecimal.valueOf(23800)))
-            .status(ProductStatus.SELL)
-            .build()
-        productEntity.setStock(productStockEntity)
+        val users = List(1) { i ->
+            UserEntity.builder()
+                .name("username")
+                .email("email")
+                .build()
+        }
+        val accounts = List(1) { i ->
+            AccountEntity.builder()
+                .balance(Money.ZERO)
+                .user(users[i])
+                .build()
+        }
+        users.map { em.persist(it) }
+        accounts.map { em.persist(it) }
 
-        entityManager.persist(userEntity)
-        entityManager.persist(accountEntity)
-        entityManager.persist(productEntity)
+        val products = List(2) { i ->
+            ProductEntity.builder()
+                .name("product")
+                .description("description")
+                .price(Money.of(BigDecimal.valueOf(25000)))
+                .status(ProductStatus.SELL)
+                .build()
+        }
+        products.map { em.persist(it) }
+        val stock = List(2) { i ->
+            StockEntity.builder()
+                .value(BigDecimal.valueOf(100))
+                .productId(products[i].id)
+                .updatedAt(LocalDateTime.now())
+                .build()
+        }
+        stock.map { em.persist(it) }
 
-        entityManager.flush()
-        entityManager.clear()
+        em.flush()
+        em.clear()
     }
 
     @Test
@@ -68,7 +76,6 @@ class PlaceOrderIntegrationTest(
         val command = PlaceOrderCommand(
             1L,
             address = Address("street", "city"),
-            userCouponId = null,
             items = listOf(
                 PlaceOrderCommand.OrderItem(1L, BigDecimal.valueOf(2))
             )
@@ -78,10 +85,10 @@ class PlaceOrderIntegrationTest(
         placeOrderService.placeOrder(command)
 
         // then
-        val productEntity = entityManager.find(ProductEntity::class.java, 1L)
-        val orderEntity = entityManager.find(OrderEntity::class.java, 1L)
+        val stock = em.find(StockEntity::class.java, 1L).value
+        val orderEntity = em.find(OrderEntity::class.java, 1L)
 
-        assertEquals(productEntity.stock.getValue(), BigDecimal.valueOf(98).setScale(2))
+        assertEquals(stock, BigDecimal.valueOf(98).setScale(2))
         assertEquals(orderEntity.status, OrderStatus.ORDERED)
     }
 
@@ -91,8 +98,8 @@ class PlaceOrderIntegrationTest(
         val couponEntity = PercentDiscountCouponEntity.builder()
             .name("10% discount")
             .description("10% discount coupon")
-            .issueOfPeriod(DateTimePeriod(LocalDateTime.now(), LocalDateTime.now().plusMonths(1)))
-            .useOfPeriod(DateTimePeriod(LocalDateTime.now(), LocalDateTime.now().plusMonths(1)))
+//            .issueOfPeriod(DateTimePeriod(LocalDateTime.now(), LocalDateTime.now().plusMonths(1)))
+//            .useOfPeriod(DateTimePeriod(LocalDateTime.now(), LocalDateTime.now().plusMonths(1)))
             .maxDiscountAmount(Money.of(BigDecimal.valueOf(10000)))
             .minOrderAmount(Money.of(BigDecimal.valueOf(10000)))
             .percent(BigDecimal.valueOf(0.1).setScale(2))
@@ -103,8 +110,8 @@ class PlaceOrderIntegrationTest(
             .status(UserCouponStatus.UNUSED)
             .build()
 
-        entityManager.persist(couponEntity)
-        entityManager.persist(userCouponEntity)
+        em.persist(couponEntity)
+        em.persist(userCouponEntity)
 
         val command = PlaceOrderCommand(
             1L,
@@ -119,7 +126,7 @@ class PlaceOrderIntegrationTest(
         placeOrderService.placeOrder(command)
 
         // then
-        val orderEntity = entityManager.find(OrderEntity::class.java, 1L)
+        val orderEntity = em.find(OrderEntity::class.java, 1L)
 
         val totalAmounts = BigDecimal.valueOf(23800 * 2).setScale(2)
         val totalDiscountAmounts = totalAmounts.multiply(BigDecimal.valueOf(0.1)).setScale(2)

@@ -8,5 +8,7 @@ enum class OrderStatus(
     PAID("결제완료"),
     DELIVERING("배달중"),
     DELIVERED("배달완료"),
-    CANCELED("주문취소")
+    CANCELED("주문취소"),
+    REFUNDED("환불완료"),
+    FAILED("주문실패")
 }

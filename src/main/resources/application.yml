@@ -6,7 +6,8 @@ spring:
     url: jdbc:mysql://localhost:3307/ecommerce
     username: user
     password: password
-
+    hikari:
+      maximum-pool-size: 60
   #  h2:
   #    console:
   #      enabled: true
@@ -24,5 +25,7 @@ spring:
         jdbc.batch_size: 30
 logging:
   level:
-    org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql: trace
+    org:
+      springframework.transaction.interceptor: trace
+      hibernate.SQL: debug
+      hibernate.type.descriptor.sql: trace
