@@ -36,14 +36,14 @@ create table `product`
     primary key (product_id)
 );
 
-drop table if exists `product_stock`;
-create table `product_stock`
+drop table if exists `stock`;
+create table `stock`
 (
-    product_stock_id bigint not null auto_increment,
-    stock_value      numeric(38, 2),
-    product_id       bigint unique,
-    updated_at       timestamp(6),
-    primary key (product_stock_id)
+    stock_id    bigint not null auto_increment,
+    stock_value numeric(38, 2),
+    product_id  bigint unique,
+    updated_at  timestamp(6),
+    primary key (stock_id)
 );
 
 drop table if exists `coupon`;

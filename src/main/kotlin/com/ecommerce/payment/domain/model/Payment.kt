@@ -26,7 +26,7 @@ class Payment(
      * 결제하기
      */
     fun pay(account: Account) {
-        order.paid()
+        order.pay()
         this.amount = calculatePaymentAmount()
         account.withdraw(this.amount)
     }

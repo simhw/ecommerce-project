@@ -6,7 +6,7 @@ import java.math.BigDecimal
 data class PlaceOrderCommand(
     val userId: Long,
     val address: Address,
-    val userCouponId: Long?,
+    val userCouponId: Long? = null,
     val items: List<OrderItem>
 ) {
     data class OrderItem(
