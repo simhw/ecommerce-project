@@ -1,50 +1,57 @@
-package com.ecommerce.coupon.command.adapter.out.persistence.entity;
+package com.ecommerce.coupon.command.adapter.out.persistence.entity
 
-import com.ecommerce.common.BaseEntity;
-import com.ecommerce.common.model.DateTimePeriod;
-import com.ecommerce.common.model.Money;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.ecommerce.common.BaseEntity
+import com.ecommerce.common.model.Money
+import com.ecommerce.common.model.Period
+import jakarta.persistence.*
+import jakarta.persistence.CascadeType.*
+import jakarta.persistence.FetchType.*
+import lombok.AllArgsConstructor
+import java.math.BigDecimal
 
-@Getter
 @AllArgsConstructor
 @Entity
 @Table(name = "coupon")
 @DiscriminatorColumn(name = "discount_type")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public abstract class CouponEntity extends BaseEntity {
+abstract class CouponEntity(
     @Id
     @Column(name = "coupon_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    val id: Long? = null,
+    val name: String,
+    val description: String,
 
-    private String name;
-
-    private String description;
-
-    // 최소 주문 금액
     @Embedded
-    @AttributeOverride(name = "amount", column = @Column(name = "min_order_amount"))
-    private Money minOrderAmount;
+    val period: Period,
 
-    // 최대 할인 금액
-    @Embedded
-    @AttributeOverride(name = "amount", column = @Column(name = "max_discount_amount"))
-    private Money maxDiscountAmount;
+    @OneToOne(fetch = LAZY, cascade = [ALL], orphanRemoval = true)
+    @JoinColumn(name = "coupon_id")
+    val condition: DiscountConditionEntity
+) : BaseEntity()
 
-    // 발행 기간
-    @Embedded
-    @AttributeOverride(name = "startDateTime", column = @Column(name = "issue_start_at"))
-    @AttributeOverride(name = "endDateTime", column = @Column(name = "issue_end_at"))
-    private DateTimePeriod issueOfPeriod;
+@Entity
+@DiscriminatorValue("percent")
+class PercentDiscountCouponEntity(
+    id: Long? = null,
+    name: String,
+    description: String,
+    period: Period,
+    condition: DiscountConditionEntity,
+    @Column(name = "discount_percent")
+    val percent: BigDecimal,
+    val maxDiscountAmount: Money
+) : CouponEntity(id, name, description, period, condition)
 
-    // 사용 기간
-    @Embedded
-    @AttributeOverride(name = "startDateTime", column = @Column(name = "use_start_at"))
-    @AttributeOverride(name = "endDateTime", column = @Column(name = "use_end_at"))
-    private DateTimePeriod useOfPeriod;
+@Entity
+@DiscriminatorValue("amount")
+class AmountDiscountCouponEntity(
+    id: Long? = null,
+    name: String,
+    description: String,
+    period: Period,
+    condition: DiscountConditionEntity,
+    @AttributeOverride(name = "amount", column = Column(name = "discount_amount"))
+    val amount: Money
+) : CouponEntity(id, name, description, period, condition)
 
-    protected CouponEntity() {
-    }
-}

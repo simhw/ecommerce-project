@@ -18,10 +18,12 @@ spring:
   jpa:
     generate-ddl: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop
     properties:
       hibernate:
+        show_sql: true
         format_sql: true
+        use_sql_comments: false
         jdbc.batch_size: 30
 logging:
   level:
@@ -29,3 +31,4 @@ logging:
       springframework.transaction.interceptor: trace
       hibernate.SQL: debug
       hibernate.type.descriptor.sql: trace
+      hibernate.orm.jdbc.bind: trace

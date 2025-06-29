@@ -1,9 +1,10 @@
 package com.ecommerce.usercoupon
 
-import com.ecommerce.common.model.DateTimePeriod
 import com.ecommerce.common.model.Money
+import com.ecommerce.common.model.Period
 import com.ecommerce.coupon.command.application.port.out.LoadCouponPort
-import com.ecommerce.coupon.command.domain.model.PercentDiscountCoupon
+import com.ecommerce.coupon.command.domain.NoneCondition
+import com.ecommerce.coupon.command.domain.PercentDiscountCoupon
 import com.ecommerce.user.application.out.LoadUserPort
 import com.ecommerce.user.domain.model.User
 import com.ecommerce.usercoupon.command.application.`in`.IssueCouponCommand
@@ -32,11 +33,13 @@ class IssueCouponServiceTest {
             id = 1,
             name = "coupon",
             description = "description",
-            minOrderAmount = Money.of(BigDecimal.valueOf(10000)),
-            maxDiscountAmount = Money.of(BigDecimal.valueOf(10000)),
-            useOfPeriod = DateTimePeriod(LocalDateTime.now(), LocalDateTime.now()),
-            issueOfPeriod = DateTimePeriod(LocalDateTime.now().minusDays(2), LocalDateTime.now().minusDays(1)),
-            percent = BigDecimal.valueOf(0.1)
+            period = Period(
+                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now().minusDays(1)
+            ),
+            condition = NoneCondition(),
+            percent = BigDecimal.valueOf(0.1),
+            maxDiscountAmount = Money.of(BigDecimal.valueOf(1000))
         )
         val command = IssueCouponCommand(1L, 1L)
 

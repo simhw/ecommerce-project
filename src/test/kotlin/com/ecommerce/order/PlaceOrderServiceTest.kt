@@ -1,9 +1,10 @@
 package com.ecommerce.order
 
 import com.ecommerce.common.model.Address
-import com.ecommerce.common.model.DateTimePeriod
 import com.ecommerce.common.model.Money
-import com.ecommerce.coupon.command.domain.model.PercentDiscountCoupon
+import com.ecommerce.common.model.Period
+import com.ecommerce.coupon.command.domain.NoneCondition
+import com.ecommerce.coupon.command.domain.PercentDiscountCoupon
 import com.ecommerce.order.command.application.`in`.PlaceOrderCommand
 import com.ecommerce.order.command.application.out.SaveOrderPort
 import com.ecommerce.order.command.domain.service.PlaceOrderService
@@ -36,7 +37,7 @@ class PlaceOrderServiceTest {
     private val saveOrderPort = mockk<SaveOrderPort>()
     private val eventPublisher = mockk<ApplicationEventPublisher>()
 
-    private val placeOrderService =
+    private val service =
         PlaceOrderService(loadUserPort, userCouponPort, productPort, saveOrderPort, eventPublisher)
 
     @Test
@@ -94,7 +95,7 @@ class PlaceOrderServiceTest {
         )
 
         // when
-        placeOrderService.placeOrder(command)
+        service.placeOrder(command)
 
         // then
         assertEquals(BigDecimal.valueOf(99), stock1.value)
@@ -110,6 +111,7 @@ class PlaceOrderServiceTest {
             name = "username",
             createdAt = LocalDateTime.now()
         )
+
         val product1 = Product(
             1L,
             "name",
@@ -117,6 +119,7 @@ class PlaceOrderServiceTest {
             price = Money.of(BigDecimal.valueOf(23800)),
             status = ProductStatus.SELL
         )
+
         val product2 = Product(
             2L,
             "name",
@@ -124,29 +127,32 @@ class PlaceOrderServiceTest {
             price = Money.of(BigDecimal.valueOf(18900)),
             status = ProductStatus.SELL
         )
+
         val stock1 = Stock(
             1L,
             BigDecimal.valueOf(100),
             1L,
             LocalDateTime.now()
         )
+
         val stock2 = Stock(
             2L,
             BigDecimal.valueOf(100),
             2L,
             LocalDateTime.now()
         )
+
         val coupon = PercentDiscountCoupon(
             id = 1L,
             name = "10% discount coupon",
             "description",
-            minOrderAmount = Money.of(BigDecimal.valueOf(50000)),
+            period = Period(LocalDateTime.now().minusDays(2), LocalDateTime.now().minusDays(1)),
+            condition = NoneCondition(),
+            percent = BigDecimal.valueOf(0.1),
             maxDiscountAmount = Money.of(BigDecimal.valueOf(10000)),
-            useOfPeriod = DateTimePeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(1)),
-            issueOfPeriod = DateTimePeriod(LocalDateTime.now().minusDays(2), LocalDateTime.now().minusDays(1)),
-            percent = BigDecimal.valueOf(0.1)
         )
-        val userCoupon = UserCoupon(
+
+        val usercoupon = UserCoupon(
             id = 1L,
             userId = 1L,
             coupon = coupon,
@@ -158,7 +164,7 @@ class PlaceOrderServiceTest {
         every { productPort.loadProductBy(2L) } returns product2
         every { stockPort.loadStockByProductId(1L) } returns stock1
         every { stockPort.loadStockByProductId(2L) } returns stock2
-        every { userCouponPort.loadUserCouponById(1L) } returns userCoupon
+        every { userCouponPort.loadUserCouponById(1L) } returns usercoupon
         every { saveOrderPort.saveOrder(any()) } just Runs
         every { stockPort.saveAllStock(any()) } just Runs
         every { userCouponPort.saveUserCoupon(any()) } just Runs
@@ -174,7 +180,7 @@ class PlaceOrderServiceTest {
         )
 
         // when
-        val orderInfo = placeOrderService.placeOrder(command)
+        val orderInfo = service.placeOrder(command)
 
         // then
         assertEquals(orderInfo.totalAmounts.getAmount(), BigDecimal.valueOf(61600))

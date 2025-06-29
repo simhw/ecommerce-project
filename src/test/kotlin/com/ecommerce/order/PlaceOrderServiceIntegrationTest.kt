@@ -3,6 +3,8 @@ package com.ecommerce.order
 import com.ecommerce.account.adapter.out.persistence.AccountEntity
 import com.ecommerce.common.model.Address
 import com.ecommerce.common.model.Money
+import com.ecommerce.common.model.Period
+import com.ecommerce.coupon.command.adapter.out.persistence.entity.NoneConditionEntity
 import com.ecommerce.coupon.command.adapter.out.persistence.entity.PercentDiscountCouponEntity
 import com.ecommerce.order.command.adapter.out.persistence.entity.OrderEntity
 import com.ecommerce.order.command.application.`in`.PlaceOrderCommand
@@ -28,8 +30,11 @@ import java.time.LocalDateTime
 @SpringBootTest
 @Transactional
 class PlaceOrderServiceIntegrationTest(
-    @Autowired val placeOrderService: PlaceOrderService,
-    @Autowired val em: EntityManager
+    @Autowired
+    val em: EntityManager,
+
+    @Autowired
+    val service: PlaceOrderService,
 ) {
     @BeforeEach
     fun init() {
@@ -45,6 +50,7 @@ class PlaceOrderServiceIntegrationTest(
                 .user(users[i])
                 .build()
         }
+
         users.map { em.persist(it) }
         accounts.map { em.persist(it) }
 
@@ -57,6 +63,7 @@ class PlaceOrderServiceIntegrationTest(
                 .build()
         }
         products.map { em.persist(it) }
+
         val stock = List(2) { i ->
             StockEntity.builder()
                 .value(BigDecimal.valueOf(100))
@@ -82,7 +89,7 @@ class PlaceOrderServiceIntegrationTest(
         )
 
         // when
-        placeOrderService.placeOrder(command)
+        service.placeOrder(command)
 
         // then
         val stock = em.find(StockEntity::class.java, 1L).value
@@ -95,42 +102,43 @@ class PlaceOrderServiceIntegrationTest(
     @Test
     fun `주문 시 쿠폰을 적용한 경우 쿠폰 할인 정책만큼 할인 금액을 반환한다`() {
         // given
-        val couponEntity = PercentDiscountCouponEntity.builder()
-            .name("10% discount")
-            .description("10% discount coupon")
-//            .issueOfPeriod(DateTimePeriod(LocalDateTime.now(), LocalDateTime.now().plusMonths(1)))
-//            .useOfPeriod(DateTimePeriod(LocalDateTime.now(), LocalDateTime.now().plusMonths(1)))
-            .maxDiscountAmount(Money.of(BigDecimal.valueOf(10000)))
-            .minOrderAmount(Money.of(BigDecimal.valueOf(10000)))
-            .percent(BigDecimal.valueOf(0.1).setScale(2))
-            .build()
-        val userCouponEntity = UserCouponEntity.builder()
+        val coupon = PercentDiscountCouponEntity(
+            null,
+            "10% 쿠폰",
+            "10% 할인",
+            period = Period(LocalDateTime.now(), LocalDateTime.now().plusDays(1)),
+            condition = NoneConditionEntity(),
+            percent = BigDecimal.valueOf(0.1),
+            maxDiscountAmount = Money.of(BigDecimal.valueOf(1000))
+        )
+
+        val issued = UserCouponEntity.builder()
             .userId(1L)
-            .coupon(couponEntity)
+            .coupon(coupon)
             .status(UserCouponStatus.UNUSED)
             .build()
 
-        em.persist(couponEntity)
-        em.persist(userCouponEntity)
+        em.persist(coupon)
+        em.persist(issued)
 
         val command = PlaceOrderCommand(
             1L,
             address = Address("street", "city"),
-            userCouponId = 1L,
+            userCouponId = issued.id,
             items = listOf(
                 PlaceOrderCommand.OrderItem(1L, BigDecimal.valueOf(2))
             )
         )
 
         // when
-        placeOrderService.placeOrder(command)
+        service.placeOrder(command)
 
         // then
-        val orderEntity = em.find(OrderEntity::class.java, 1L)
+        val order = em.find(OrderEntity::class.java, 1L)
 
         val totalAmounts = BigDecimal.valueOf(23800 * 2).setScale(2)
         val totalDiscountAmounts = totalAmounts.multiply(BigDecimal.valueOf(0.1)).setScale(2)
-        assertEquals(orderEntity.totalAmounts.getAmount().compareTo(totalAmounts), 0)
-        assertEquals(orderEntity.totalDiscountAmounts.getAmount().compareTo(totalDiscountAmounts), 0)
+        assertEquals(order.totalAmounts.getAmount().compareTo(totalAmounts), 0)
+        assertEquals(order.totalDiscountAmounts.getAmount().compareTo(totalDiscountAmounts), 0)
     }
 }
