@@ -4,6 +4,7 @@ import jakarta.persistence.Embeddable;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Function;
 
 @Embeddable
@@ -23,6 +24,26 @@ public class Money {
     }
 
     protected Money() {
+    }
+
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        Money money = (Money) other;
+        return Objects.equals(amount.doubleValue(), money.amount.doubleValue());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount.doubleValue());
     }
 
     public Money(BigDecimal amount) {

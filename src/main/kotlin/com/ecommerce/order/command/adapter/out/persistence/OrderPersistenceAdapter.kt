@@ -15,13 +15,13 @@ class OrderPersistenceAdapter(
         orderJpaRepository.save(orderEntity)
     }
 
-    override fun loadOrderBy(id: Long): Order {
+    override fun loadOrderById(id: Long): Order {
         val orderEntity = orderJpaRepository.findById(id)
             .orElseThrow { IllegalArgumentException("not found order by id: $id") }
         return orderEntityMapper.toOrder(orderEntity)
     }
 
-    override fun loadOrderBy(number: String): Order {
+    override fun loadOrderByNumber(number: String): Order {
         val orderEntity = orderJpaRepository.findByNumber(number)
         return orderEntityMapper.toOrder(orderEntity)
     }

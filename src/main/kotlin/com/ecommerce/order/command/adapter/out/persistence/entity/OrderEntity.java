@@ -50,9 +50,19 @@ public class OrderEntity extends BaseEntity {
     }
 
     @Builder
-    public OrderEntity(LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt,
-                       Long id, String number, Long userId, Address address, List<OrderLineItemEntity> items,
-                       Money totalAmounts, Money totalDiscountAmounts, OrderStatus status) {
+    public OrderEntity(
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt,
+            LocalDateTime deletedAt,
+            Long id,
+            String number,
+            Long userId,
+            Address address,
+            List<OrderLineItemEntity> items,
+            Money totalAmounts,
+            Money totalDiscountAmounts,
+            OrderStatus status
+    ) {
         super(createdAt, updatedAt, deletedAt);
         this.id = id;
         this.number = number;

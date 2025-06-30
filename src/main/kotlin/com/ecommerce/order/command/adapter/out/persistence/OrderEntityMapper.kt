@@ -14,13 +14,13 @@ import org.mapstruct.Mapping
 interface OrderEntityMapper {
     fun toOrderEntity(order: Order): OrderEntity
 
-    @Mapping(target = "items", ignore = true)
     fun toOrder(orderEntity: OrderEntity): Order
 }
 
 @Mapper(componentModel = "spring")
 interface OrderLineItemEntityMapper {
     @Mapping(target = "order", ignore = true)
-    @Mapping(source = "product.id", target = "productId")
     fun toOrderLineItemEntity(orderLineItem: OrderLineItem): OrderLineItemEntity
+
+    fun toOrderLineItem(orderLineItemEntity: OrderLineItemEntity): OrderLineItem
 }

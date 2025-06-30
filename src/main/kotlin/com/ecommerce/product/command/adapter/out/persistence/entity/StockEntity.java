@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
@@ -14,24 +13,21 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @Entity
-@Table(name = "product_stock")
-public class ProductStockEntity {
+@Table(name = "stock")
+public class StockEntity {
     @Id
-    @Column(name = "product_stock_id")
+    @Column(name = "stock_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "stock_value")
     private BigDecimal value;
 
-    @Setter
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private ProductEntity product;
+    private Long productId;
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    protected ProductStockEntity() {
+    protected StockEntity() {
     }
 }

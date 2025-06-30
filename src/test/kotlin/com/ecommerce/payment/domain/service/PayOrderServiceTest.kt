@@ -69,7 +69,7 @@ class PayOrderServiceTest {
         )
 
         every { loadUserPort.loadUserBy(1L) } returns user
-        every { loadOrderPort.loadOrderBy("ORD-TEST") } returns order
+        every { loadOrderPort.loadOrderByNumber("ORD-TEST") } returns order
         every { loadAccountPort.loadAccountBy(user) } returns account
 
         every { saveOrderPort.saveOrder(any()) } just Runs
@@ -115,7 +115,7 @@ class PayOrderServiceTest {
         )
 
         every { loadUserPort.loadUserBy(1L) } returns user
-        every { loadOrderPort.loadOrderBy("ORD-TEST") } returns order
+        every { loadOrderPort.loadOrderByNumber("ORD-TEST") } returns order
         every { loadAccountPort.loadAccountBy(user) } returns account
 
         every { saveOrderPort.saveOrder(any()) } just Runs

@@ -1,7 +1,8 @@
 package com.ecommerce.usercoupon
 
-import com.ecommerce.common.model.DateTimePeriod
 import com.ecommerce.common.model.Money
+import com.ecommerce.common.model.Period
+import com.ecommerce.coupon.command.adapter.out.persistence.entity.NoneConditionEntity
 import com.ecommerce.coupon.command.adapter.out.persistence.entity.PercentDiscountCouponEntity
 import com.ecommerce.user.adapter.out.persistence.UserEntity
 import com.ecommerce.usercoupon.command.adapter.out.persistence.UserCouponEntity
@@ -22,29 +23,30 @@ import java.time.LocalDateTime
 @SpringBootTest
 @Transactional
 class IssueCouponIntegrationTest(
-    @Autowired val issueCouponService: IssueCouponService,
-    @Autowired val entityManager: EntityManager
+    @Autowired val service: IssueCouponService,
+    @Autowired val em: EntityManager
 ) {
     @BeforeEach
     fun init() {
-        val userEntity = UserEntity.builder()
+        val user = UserEntity.builder()
             .name("username")
             .email("email")
             .build()
-        val couponEntity = PercentDiscountCouponEntity.builder()
-            .name("10% discount")
-            .description("10% discount coupon")
-            .issueOfPeriod(DateTimePeriod(LocalDateTime.now(), LocalDateTime.now().plusMonths(1)))
-            .useOfPeriod(DateTimePeriod(LocalDateTime.now(), LocalDateTime.now().plusMonths(1)))
-            .maxDiscountAmount(Money.of(BigDecimal.valueOf(10000)))
-            .minOrderAmount(Money.of(BigDecimal.valueOf(10000)))
-            .percent(BigDecimal.valueOf(0.1).setScale(2))
-            .build()
 
-        entityManager.persist(userEntity)
-        entityManager.persist(couponEntity)
-        entityManager.flush()
-        entityManager.clear()
+        val coupon = PercentDiscountCouponEntity(
+            null,
+            "10% 쿠폰",
+            "10% 할인",
+            Period(LocalDateTime.now(), LocalDateTime.now().plusDays(1)),
+            NoneConditionEntity(null, null, null),
+            BigDecimal.valueOf(0.1).setScale(2),
+            Money(BigDecimal.valueOf(10000))
+        )
+
+        em.persist(user)
+        em.persist(coupon)
+        em.flush()
+        em.clear()
     }
 
     @Test
@@ -53,12 +55,11 @@ class IssueCouponIntegrationTest(
         val command = IssueCouponCommand(1L, 1L)
 
         // when
-        issueCouponService.issueCoupon(command)
+        service.issueCoupon(command)
 
         // then
-        val userCouponEntity = entityManager.find(UserCouponEntity::class.java, 1L)
-
-        assertEquals(userCouponEntity.userId, 1L)
-        assertEquals(userCouponEntity.status, UserCouponStatus.UNUSED)
+        val usercoupon = em.find(UserCouponEntity::class.java, 1L)
+        assertEquals(usercoupon.userId, 1L)
+        assertEquals(usercoupon.status, UserCouponStatus.UNUSED)
     }
 }

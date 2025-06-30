@@ -1,8 +1,6 @@
 package com.ecommerce.product.query.infra
 
 import com.ecommerce.product.query.application.ProductView
-import com.ecommerce.product.query.application.QProductData
-import com.ecommerce.product.query.application.QProductStockData
 import com.querydsl.core.types.Projections
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.redisson.api.RScoredSortedSet
