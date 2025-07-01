@@ -1,7 +1,8 @@
 # 객체지향 설계
 
-- 단일 책임 원칙(SRP)을 위배하는 절차지향의 문제점을 해결
-- 요구사항이 변경 시 기존 코드를 수정하지 않고 확장 가능하도록함
+- 변경의 영향이 전파되는 강한 결합도의 절차지향 설계의 문제점을 해결
+- 데이터와 프로세스를 하나의 객체로 묶어 스스로 책임을 수행하도록 구현    
+- 요구사항 변경 시 기존 코드를 수정하지 않고 확장을 통해 변경 가능하도록함
 
 ## 1. 쿠폰 도메인
 
@@ -24,12 +25,12 @@ classDiagram
 
         class PercentDiscountCoupon {
             Double percent
-            Money maxAmount
+            Money maxDiscountAmount
             + getDiscountAmount()
         }
     }
 
-    namespace 할인조건판단 {
+    namespace 할인여부판단 {
         class PeriodCondition {
             Period period
             + isSatisfiedBy()
@@ -75,19 +76,9 @@ classDiagram
     DiscountCondition <|-- AllCondition
     DiscountCondition <|-- AnyCondition
 
-
 ```
 
 ### 1-1. Coupon
-
-<style>
-  th{
-    text-align: center;
-  }
-  td {
-    text-align: center;
-  }
-</style>
 
 <table>
   <tr>
@@ -135,10 +126,16 @@ class AmountDiscountCoupon(
 }
 
 class PercentDiscountCoupon(
-    val percent: BigDecimal
+    val percent: BigDecimal,
+    val maxDiscountAmount: Money 
 ) {
     override fun getDiscountAmount(amount: Money): Money {
-        return amount.multi(percent)
+        val discounted = amount.multiply(percent)
+
+        if (discounted.isLessThan(maxDiscountAmount)) {
+            return discounted
+        }
+        return maxDiscountAmount
     }
 }
 ```
@@ -164,21 +161,6 @@ class PercentDiscountCoupon(
   </tr>
 </table>
 
-- 복합 할인 조건을 위한 `Composite Pattern` 적용
-
-<table>
-  <tr>
-    <td></td>
-    <td>AnyCondition</td>
-    <td>AllCondition</td>
-  </tr>
-  <tr>
-    <td>상세 구현</td>
-    <td>여러 조건 중 모든 조건이 충족하는 경우</td>
-    <td>여러 조건 중 하나라도 충족하는 경우 </td>
-  </tr>
-</table>
-
 ```kotlin
 
 sealed interface DiscountCondition {
@@ -201,6 +183,26 @@ class PeriodCondition(
     }
 }
 
+```
+
+- 복합 할인 조건을 위한 `Composite Pattern`적용
+- 클라이언트는 인터페이스를 통해 개별, 복합 조건을 동일하게 사용
+
+<table>
+  <tr>
+    <td></td>
+    <td>AnyCondition</td>
+    <td>AllCondition</td>
+  </tr>
+  <tr>
+    <td>상세 구현</td>
+    <td>여러 조건 중 모든 조건이 충족하는 경우</td>
+    <td>여러 조건 중 하나라도 충족하는 경우 </td>
+  </tr>
+</table>
+
+```kotlin
+
 class AllCondition(
     val conditions: List<DiscountCondition>
 ) : DiscountCondition {
@@ -218,6 +220,7 @@ class AnyCondition(
 }
 
 ```
+
 
 ## 2. 주문 도메인
 
@@ -242,3 +245,7 @@ classDiagram
     OrderLineItem --> Product
 
 ```
+
+### 2-1. Order 
+
+
