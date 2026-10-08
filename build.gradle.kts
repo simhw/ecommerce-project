@@ -43,6 +43,7 @@ dependencies {
 //    lombok
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+    kapt("org.projectlombok:lombok")
     runtimeOnly("com.mysql:mysql-connector-j")
 //    test
     testImplementation("io.mockk:mockk:1.13.4")
@@ -57,23 +58,13 @@ allOpen {
     annotation("javax.persistence.Embeddable")
 }
 
-// querydsl build option
-val querydslDir = "/generated/source/kapt/main"
-
-sourceSets["main"].java.srcDir(querydslDir)
-
-tasks.withType<JavaCompile> {
-    options.generatedSourceOutputDirectory.set(file(querydslDir))
-}
-
-tasks.named("clean") {
-    doLast {
-        file(querydslDir).deleteRecursively()
-    }
-}
+// src/main/kotlin 아래의 .java 파일(엔티티 등)도 javac 가 컴파일하도록 포함
+sourceSets["main"].java.srcDir("src/main/kotlin")
 
 kapt {
     correctErrorTypes = true
+    // kapt 사용 시에도 javac 가 lombok 을 처리하도록 유지
+    keepJavacAnnotationProcessors = true
 }
 
 kotlin {
