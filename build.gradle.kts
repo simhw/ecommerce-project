@@ -52,12 +52,6 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-allOpen {
-    annotation("javax.persistence.Entity")
-    annotation("javax.persistence.MappedSuperclass")
-    annotation("javax.persistence.Embeddable")
-}
-
 // src/main/kotlin 아래의 .java 파일(엔티티 등)도 javac 가 컴파일하도록 포함
 sourceSets["main"].java.srcDir("src/main/kotlin")
 

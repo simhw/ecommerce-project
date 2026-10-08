@@ -1,21 +1,27 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./gradlew test:*)",
-      "Bash(./gradlew compileKotlin:*)",
-      "Bash(./gradlew compileTestKotlin:*)",
-      "Bash(./gradlew build:*)",
-      "Bash(./gradlew clean:*)",
-      "Bash(./gradlew dependencies:*)",
-      "Bash(docker compose up -d:*)",
-      "Bash(docker compose ps:*)",
-      "Bash(docker compose logs:*)",
+      "Bash(./gradlew test)",
+      "Bash(./gradlew test --tests *)",
+      "Bash(./gradlew compileKotlin)",
+      "Bash(./gradlew compileTestKotlin)",
+      "Bash(./gradlew build)",
+      "Bash(./gradlew clean)",
+      "Bash(./gradlew dependencies)",
+      "Bash(docker compose up -d)",
+      "Bash(docker compose ps)",
+      "Bash(docker compose logs *)",
       "mcp__idea__build_project",
       "mcp__idea__get_file_problems",
       "mcp__idea__lint_files"
     ],
     "deny": [
-      "Bash(docker compose down -v:*)"
+      "Bash(docker compose * -v*)",
+      "Bash(docker compose * --volumes*)",
+      "Bash(docker-compose * -v*)",
+      "Bash(docker-compose * --volumes*)",
+      "Bash(docker volume rm*)",
+      "Bash(docker volume prune*)"
     ]
   }
 }

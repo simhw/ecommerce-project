@@ -126,15 +126,17 @@ docker compose up -d                                   # MySQL + Redis (@SpringB
 
 테스트들이 ID `1L`, `2L` 을 하드코딩하는데, Spring 컨텍스트(와 `create-drop` 스키마)는 테스트 클래스 간에 공유되고 동시성 테스트는 데이터를 정리하지 않는다. 그래서 **결과가 실행 순서에 따라 달라진다.** 예: `PlaceOrderServiceConcurrencyTest` 는 전체 실행에서는 실패하지만 단독 실행에서는 통과한다. 회귀 여부는 해당 클래스를 단독 실행해서 판단할 것.
 
-### 현재 실패하는 테스트 (2026-10-08, `./gradlew test` 기준 19개 중 12개)
+### 실패하는 것으로 확인된 테스트
 
-- `PlaceOrderServiceTest` (2) — `ApplicationEventPublisher` 목에 `publishEvent` 스텁이 없고, 서비스가 더 이상 하지 않는 재고 차감을 검증한다.
-- 쿠폰을 저장하는 통합 테스트 (5: `CalculateDiscountServiceIntegrationsTest`, `CouponEntityMapperTest`, `IssueCouponIntegrationTest`, `PlaceOrderServiceIntegrationTest`) — 위 `coupon_id` 매핑 문제.
-- `ChargeBalanceIntegrationTest` (2), `PlaceOrderServiceIntegrationTest` (1) — ID 하드코딩. `ChargeBalanceIntegrationTest` 는 단독 실행 시 2개 중 1개만 실패.
-- `PlaceOrderServiceConcurrencyTest` (1) — 격리 문제. 단독 실행 시 통과.
-- `DecreaseStockServiceConcurrencyTest` (1) — 단독 실행해도 실패. 재고 10 에 15건 차감 후 `-5` 를 기대하는데 실제 결과는 `0` 이다 (기대값이 잘못됨).
+수치는 적지 않는다(실행 순서에 따라 달라짐). 아래 원인이 고쳐지면 해당 항목을 지울 것.
+
+- `PlaceOrderServiceTest` — `ApplicationEventPublisher` 목에 `publishEvent` 스텁이 없고, 서비스가 더 이상 하지 않는 재고 차감을 검증한다.
+- 쿠폰을 저장하는 통합 테스트 (`CalculateDiscountServiceIntegrationsTest`, `CouponEntityMapperTest`, `IssueCouponIntegrationTest`, `PlaceOrderServiceIntegrationTest`) — 위 `coupon_id` 매핑 문제.
+- `ChargeBalanceIntegrationTest`, `PlaceOrderServiceIntegrationTest` — ID 하드코딩. 단독 실행 시 결과가 달라진다.
+- `PlaceOrderServiceConcurrencyTest` — 격리 문제. 단독 실행 시 통과.
+- `DecreaseStockServiceConcurrencyTest` — 단독 실행해도 실패. 재고 10 에 15건 차감 후 `-5` 를 기대하는데 실제 결과는 `0` 이다 (기대값이 잘못됨).
 
 ## Git
 
 - 브랜치: `feat/*` → `dev` → `main` (PR 머지)
-- 커밋: `feat:` / `refactor:` / `test:` / `docs:` + 한글 요약
+- 커밋: `feat:` / `fix:` / `refactor:` / `test:` / `docs:` + 한글 요약
